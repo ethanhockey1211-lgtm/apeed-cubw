@@ -113,6 +113,7 @@ export default function QuizMode({ section }: { section: SectionDef }) {
               alg={current.alg}
               setupAlg="z2"
               stickering={section.stickering}
+              stickeringMask={section.stickeringMask}
               controls={revealed}
               tempo={1.2}
               label={revealed ? `Solution for ${current.name}` : "Mystery case — recall the algorithm"}

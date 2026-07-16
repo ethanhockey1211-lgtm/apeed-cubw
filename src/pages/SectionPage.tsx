@@ -34,6 +34,7 @@ export default function SectionPage({ section }: { section: SectionDef }) {
         (c.nickname ?? "").toLowerCase().includes(q) ||
         c.alg.toLowerCase().includes(q) ||
         (c.altAlgs ?? []).some((a) => a.toLowerCase().includes(q)) ||
+        c.recognition.toLowerCase().includes(q) ||
         c.difficulty.includes(q)
       );
     });

@@ -91,6 +91,8 @@ export default function TwistyCube({
   onMoveIndexRef.current = onMoveIndex;
   const lastMoveIndexRef = useRef<number | null>(null);
   const { theme } = useTheme();
+  const themeRef = useRef(theme);
+  themeRef.current = theme;
 
   useEffect(() => {
     let cancelled = false;
@@ -116,6 +118,7 @@ export default function TwistyCube({
         ...(cameraLongitude !== undefined ? { cameraLongitude } : {}),
         ...(cameraDistance !== undefined ? { cameraDistance } : {}),
       });
+      player.colorScheme = themeRef.current;
       playerRef.current = player;
       mountRef.current.replaceChildren(player);
 

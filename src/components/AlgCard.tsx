@@ -155,6 +155,7 @@ function AlgCardInner({ algCase, section }: AlgCardProps) {
             alg={algCase.alg}
             setupAlg="z2"
             stickering={section.stickering}
+            stickeringMask={section.stickeringMask}
             tempo={1.2}
             label={`3D cube showing the ${algCase.name} case`}
             onMoveIndex={setActiveMove}
