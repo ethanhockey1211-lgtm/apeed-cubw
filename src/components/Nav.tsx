@@ -1,0 +1,108 @@
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
+import { sections } from "../data/sections";
+import { accents } from "../lib/accents";
+import { useProgress } from "../lib/progress";
+
+const navItems = sections.map((s) => ({
+  to: `/${s.id}`,
+  label: s.name,
+  accent: s.accent,
+  ids: s.cases.map((c) => c.id),
+}));
+
+export default function Nav() {
+  const { countLearned } = useProgress();
+  const location = useLocation();
+
+  return (
+    <>
+      {/* Top bar */}
+      <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+          <Link to="/" className="flex items-center gap-2.5" aria-label="CubeFlow home">
+            <Logo />
+            <span className="font-display text-lg font-bold tracking-tight">
+              Cube<span className="text-cube-yellow">Flow</span>
+            </span>
+          </Link>
+
+          <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="Main">
+            {navItems.map((item) => {
+              const active = location.pathname.startsWith(item.to);
+              const learned = countLearned(item.ids);
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={`relative rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                    active ? "text-ink" : "text-muted hover:text-ink"
+                  }`}
+                >
+                  {item.label}
+                  {item.ids.length > 0 && learned > 0 && (
+                    <span className={`ml-1.5 text-[10px] font-semibold tabular-nums ${accents[item.accent].text}`}>
+                      {learned}/{item.ids.length}
+                    </span>
+                  )}
+                  {active && (
+                    <motion.span
+                      layoutId="nav-underline"
+                      className={`absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full ${accents[item.accent].bg}`}
+                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    />
+                  )}
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="ml-auto md:ml-0">
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile bottom tab bar */}
+      <nav
+        aria-label="Sections"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+      >
+        <div className="grid grid-cols-5">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${isActive ? "text-ink" : "text-faint"}`
+            }
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M3 10.5 12 3l9 7.5" />
+              <path d="M5 9.5V21h14V9.5" />
+            </svg>
+            Home
+          </NavLink>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${
+                  isActive ? accents[item.accent].text : "text-faint"
+                }`
+              }
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
+                <rect x="4" y="4" width="16" height="16" rx="2.5" />
+                <path d="M4 9.33h16M4 14.66h16M9.33 4v16M14.66 4v16" strokeWidth="1.4" />
+              </svg>
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    </>
+  );
+}

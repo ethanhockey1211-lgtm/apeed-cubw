@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Semantic theme tokens. Dark is the default aesthetic; light flips the
+  neutrals and deepens the cube accents for contrast on white.
+*/
+:root {
+  --c-bg: #f6f6f8;
+  --c-surface: #ffffff;
+  --c-surface-2: #eeeef1;
+  --c-border: rgba(20, 20, 30, 0.1);
+  --c-border-strong: rgba(20, 20, 30, 0.18);
+  --c-text: #16161c;
+  --c-muted: #565660;
+  --c-faint: #8d8d98;
+
+  --c-yellow: #c99700;
+  --c-red: #d31c30;
+  --c-orange: #e04e00;
+  --c-blue: #1d64d8;
+  --c-green: #009454;
+  --c-white: #16161c; /* "white" accent reads as ink in light mode */
+
+  --glow-strength: 0.1;
+}
+
+.dark {
+  --c-bg: #0a0a0e;
+  --c-surface: #131319;
+  --c-surface-2: #1b1b23;
+  --c-border: rgba(255, 255, 255, 0.08);
+  --c-border-strong: rgba(255, 255, 255, 0.16);
+  --c-text: #f4f4f7;
+  --c-muted: #a2a2ad;
+  --c-faint: #6c6c78;
+
+  --c-yellow: #ffd60a;
+  --c-red: #ff4d5e;
+  --c-orange: #ff7a1a;
+  --c-blue: #4c8dff;
+  --c-green: #00d474;
+  --c-white: #f4f4f7;
+
+  --glow-strength: 0.22;
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-line: var(--c-border);
+  --color-line-strong: var(--c-border-strong);
+  --color-ink: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+
+  --color-cube-yellow: var(--c-yellow);
+  --color-cube-red: var(--c-red);
+  --color-cube-orange: var(--c-orange);
+  --color-cube-blue: var(--c-blue);
+  --color-cube-green: var(--c-green);
+  --color-cube-white: var(--c-white);
+
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--c-blue) 30%, transparent);
+}
+
+/* Thin, theme-aware scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
+}
+
+/*
+  Size twisty players to their mount box. Never override `display` here —
+  the player's internal layout depends on its own :host { display: grid }.
+*/
+twisty-player {
+  width: 100%;
+  height: 100%;
+}
+
+/* Keyboard focus ring that matches the theme */
+:focus-visible {
+  outline: 2px solid var(--c-blue);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes solved-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pulse-color, var(--c-green)) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 26px transparent;
+  }
+}
+
+.animate-solved-pulse {
+  animation: solved-pulse 700ms ease-out 2;
+}
+
+/* Subtle grid backdrop used on the landing hero */
+.hero-grid {
+  background-image:
+    linear-gradient(var(--c-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-border) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, black 30%, transparent 75%);
+}

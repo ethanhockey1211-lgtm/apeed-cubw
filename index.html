@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/cube.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="CubeFlow — learn CFOP speedcubing with interactive 3D cubes. Cross, F2L, OLL and PLL with every algorithm animated, progress tracking and quiz mode."
+    />
+    <title>CubeFlow — Learn CFOP with Interactive 3D Cubes</title>
+    <script>
+      // Apply saved theme before first paint to avoid a flash.
+      try {
+        if (localStorage.getItem("cubeflow-theme") === "light") {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
