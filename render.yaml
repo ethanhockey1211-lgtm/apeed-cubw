@@ -1,0 +1,17 @@
+services:
+  # CubeFlow is a fully static Vite build — no backend, no Python.
+  # Deploy as a Render Static Site: build with npm, publish dist/.
+  - type: web
+    runtime: static
+    name: cubeflow
+    branch: claude/cfop-speedcubing-tutorial-1esajg
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+    routes:
+      # SPA fallback so /f2l, /oll, /pll and /cross resolve on hard refresh
+      - type: rewrite
+        source: /*
+        destination: /index.html
