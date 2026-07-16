@@ -3,6 +3,16 @@ export interface CrossPrinciple {
   body: string;
 }
 
+/**
+ * Stickering mask for the white-bottom display frame: the white cross edges
+ * (model-U pieces, shown at the bottom after the z2 setup) stay regular, the
+ * white center stays bright, other centers are dimmed for reference, and
+ * everything else is ignored. The built-in "Cross" stickering can't be used
+ * here — it marks the model-D (yellow) pieces.
+ */
+export const WHITE_CROSS_MASK =
+  "EDGES:----IIIIIIII,CORNERS:IIIIIIII,CENTERS:-DDDDD";
+
 export interface CrossLesson {
   title: string;
   explanation: string;

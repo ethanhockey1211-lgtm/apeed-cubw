@@ -2,6 +2,7 @@ import type { SectionDef, SectionId } from "../lib/types";
 import { pllGroups, pllCases } from "./pll";
 import { ollGroups, ollCases } from "./oll";
 import { f2lGroups, f2lCases } from "./f2l";
+import { WHITE_CROSS_MASK } from "./cross";
 
 export const sections: SectionDef[] = [
   {
@@ -13,7 +14,8 @@ export const sections: SectionDef[] = [
     description:
       "Solve the four white edges around the white center — planned during inspection, executed blind. No algorithms here, just spatial reasoning you build with practice.",
     accent: "white",
-    stickering: "Cross",
+    stickering: "full",
+    stickeringMask: WHITE_CROSS_MASK,
     groups: [],
     cases: [],
   },

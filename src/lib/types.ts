@@ -38,6 +38,8 @@ export interface SectionDef {
   accent: AccentColor;
   /** cubing.js experimental stickering used for this section's players */
   stickering: string;
+  /** Custom stickering mask that overrides `stickering` when set */
+  stickeringMask?: string;
   groups: CaseGroup[];
   cases: AlgCase[];
 }

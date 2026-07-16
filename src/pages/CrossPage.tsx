@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import TwistyCube from "../components/TwistyCube";
 import LazyMount from "../components/LazyMount";
-import { crossLessons, crossPrinciples } from "../data/cross";
+import { crossLessons, crossPrinciples, WHITE_CROSS_MASK } from "../data/cross";
 
 export default function CrossPage() {
   return (
@@ -69,7 +69,7 @@ export default function CrossPage() {
                     alg={lesson.solution}
                     setupAlg={`z2 ${lesson.scramble}`}
                     setupAnchor="start"
-                    stickering="Cross"
+                    stickeringMask={WHITE_CROSS_MASK}
                     tempo={1}
                     label={`Cross example: ${lesson.title}`}
                     className="h-full"

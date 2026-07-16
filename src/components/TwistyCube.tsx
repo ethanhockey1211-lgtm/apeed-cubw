@@ -12,6 +12,8 @@ interface TwistyCubeProps {
   setupAnchor?: "start" | "end";
   setupAlg?: string;
   stickering?: string;
+  /** Custom mask (experimentalStickeringMaskOrbits) — overrides `stickering` */
+  stickeringMask?: string;
   /** Show the custom playback control bar */
   controls?: boolean;
   tempo?: number;
@@ -64,6 +66,7 @@ export default function TwistyCube({
   setupAnchor = "end",
   setupAlg,
   stickering = "full",
+  stickeringMask,
   controls = true,
   tempo = 1,
   cameraLatitude,
@@ -101,7 +104,9 @@ export default function TwistyCube({
         alg,
         experimentalSetupAnchor: setupAnchor,
         ...(setupAlg ? { experimentalSetupAlg: setupAlg } : {}),
-        experimentalStickering: stickering as never,
+        ...(stickeringMask
+          ? { experimentalStickeringMaskOrbits: stickeringMask }
+          : { experimentalStickering: stickering as never }),
         background: "none",
         controlPanel: "none",
         hintFacelets,
@@ -157,7 +162,7 @@ export default function TwistyCube({
       player?.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alg, setupAlg, setupAnchor, stickering, loop]);
+  }, [alg, setupAlg, setupAnchor, stickering, stickeringMask, loop]);
 
   // Keep the player's own color scheme in sync with the app theme.
   useEffect(() => {

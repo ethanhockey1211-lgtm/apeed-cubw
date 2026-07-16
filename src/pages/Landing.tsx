@@ -197,6 +197,7 @@ export default function Landing() {
                         alg=""
                         setupAlg="z2"
                         stickering={s.stickering}
+                        stickeringMask={s.stickeringMask}
                         controls={false}
                         hintFacelets="none"
                         cameraLatitude={35}
