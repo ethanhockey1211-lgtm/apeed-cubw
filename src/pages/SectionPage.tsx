@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AlgCard from "../components/AlgCard";
 import QuizMode from "../components/QuizMode";
+import { intuitionById } from "../data/learn";
 import { accents } from "../lib/accents";
 import type { Difficulty, SectionDef } from "../lib/types";
 import { useProgress } from "../lib/progress";
@@ -185,6 +186,7 @@ export default function SectionPage({ section }: { section: SectionDef }) {
                           accent={section.accent}
                           stickering={section.stickering}
                           stickeringMask={section.stickeringMask}
+                          intuition={intuitionById[c.id]}
                         />
                       ))}
                     </div>

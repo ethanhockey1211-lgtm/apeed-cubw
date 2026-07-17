@@ -1,6 +1,6 @@
 import LessonShell from "../components/LessonShell";
 import AlgCard from "../components/AlgCard";
-import { tlPllCornerCases, tlPllEdgeCases, twoLookPllIds } from "../data/learn";
+import { intuitionById, tlPllCornerCases, tlPllEdgeCases, twoLookPllIds } from "../data/learn";
 import { sectionById } from "../data/sections";
 import { useProgress } from "../lib/progress";
 
@@ -47,6 +47,7 @@ export default function TwoLookPllPage() {
               accent="red"
               stickering={pll.stickering}
               stickeringMask={pll.stickeringMask}
+              intuition={intuitionById[c.id]}
             />
           ))}
         </div>
@@ -74,6 +75,7 @@ export default function TwoLookPllPage() {
               accent="red"
               stickering={pll.stickering}
               stickeringMask={pll.stickeringMask}
+              intuition={intuitionById[c.id]}
             />
           ))}
         </div>

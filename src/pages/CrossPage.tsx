@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import TwistyCube from "../components/TwistyCube";
-import LazyMount from "../components/LazyMount";
+import GuidedSolve from "../components/GuidedSolve";
 import MarkLearnedButton from "../components/MarkLearnedButton";
 import { crossLessons, crossPrinciples, WHITE_CROSS_MASK } from "../data/cross";
 
@@ -45,14 +44,15 @@ export default function CrossPage() {
       {/* Worked examples */}
       <div className="mt-14">
         <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-          Worked examples
+          Worked examples — with the reasoning
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          Each cube starts from a scramble. Press play to watch the cross
-          solution, or step through it move by move — then try to see the
-          solution yourself before playing it.
+          Each cube starts from a scramble. Press play (or step move by move)
+          and watch the caption under the cube: it tells you <em>why</em> each chunk of
+          moves happens, not just what. Try to see the solution yourself before
+          playing it.
         </p>
-        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           {crossLessons.map((lesson) => (
             <motion.article
               key={lesson.title}
@@ -64,20 +64,19 @@ export default function CrossPage() {
             >
               <h3 className="font-display text-base font-bold tracking-tight">{lesson.title}</h3>
               <p className="mt-1 text-xs leading-relaxed text-muted">{lesson.explanation}</p>
-              <div className="mx-auto my-2 aspect-square w-full max-w-[220px]">
-                <LazyMount className="h-full w-full">
-                  <TwistyCube
-                    alg={lesson.solution}
-                    setupAlg={`z2 ${lesson.scramble}`}
-                    setupAnchor="start"
-                    stickeringMask={WHITE_CROSS_MASK}
-                    tempo={1}
-                    label={`Cross example: ${lesson.title}`}
-                    className="h-full"
-                  />
-                </LazyMount>
+              <div className="my-2">
+                <GuidedSolve
+                  compact
+                  phases={lesson.phases}
+                  setupAlg={`z2 ${lesson.scramble}`}
+                  setupAnchor="start"
+                  stickeringMask={WHITE_CROSS_MASK}
+                  accent="blue"
+                  tempo={0.8}
+                  label={`Cross example: ${lesson.title}`}
+                />
               </div>
-              <div className="rounded-xl bg-surface-2/70 px-3 py-2.5">
+              <div className="mt-auto rounded-xl bg-surface-2/70 px-3 py-2.5">
                 <p className="text-[10px] font-bold tracking-wide text-faint uppercase">Solution</p>
                 <p className="mt-0.5 font-mono text-[13px] break-words">{lesson.solution}</p>
               </div>

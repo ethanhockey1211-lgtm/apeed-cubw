@@ -226,6 +226,26 @@ for (const lesson of crossLessons ?? []) {
 }
 console.log(`Cross: checked ${(crossLessons ?? []).length} lessons`);
 
+// Per-move progress report for grounding lesson narration: after each move of
+// each solution, how many cross edges are solved (relative to centers)?
+const crossEdgeCount = (pattern) => {
+  const p = normalized(pattern);
+  if (!p) return "?";
+  return U_EDGES.filter((i) => pieceSolved(p, "EDGES", i)).length;
+};
+console.log("\nCross per-move progress (solved cross edges after each move):");
+for (const lesson of crossLessons ?? []) {
+  const moves = lesson.solution.split(/\s+/).filter(Boolean);
+  const counts = [];
+  let state = stateAfter(`z2 ${lesson.scramble}`);
+  counts.push(crossEdgeCount(state));
+  for (const m of moves) {
+    state = state.applyAlg(new Alg(m));
+    counts.push(crossEdgeCount(state));
+  }
+  console.log(`  ${lesson.title}: start ${counts[0]} → ${moves.map((m, i) => `${m}:${counts[i + 1]}`).join("  ")}`);
+}
+
 // ——— OLL: orientation-pattern verification ———
 // The shape family of an OLL case is fully determined by which edges are
 // oriented; corner counts pin it down further. Both are computed from the alg
@@ -569,6 +589,54 @@ for (const c of eoCases ?? []) {
 const allCaseIds = new Set(
   [...(pllCases ?? []), ...(ollCases ?? []), ...(f2lCases ?? []), ...(eoCases ?? [])].map((c) => c.id),
 );
+
+// ——— Reasoning layer: phase chunks must reassemble into verified algs ———
+const tokens = (s) => s.split(/\s+/).filter(Boolean).join(" ");
+const { guidedF2L, intuitionById } = await import("../src/data/learn.ts");
+
+for (const lesson of crossLessons ?? []) {
+  const joined = tokens((lesson.phases ?? []).map((p) => p.moves).join(" "));
+  if (joined !== tokens(lesson.solution)) {
+    failures++;
+    console.error(`FAIL cross lesson "${lesson.title}": phases (${joined}) != solution (${lesson.solution})`);
+  }
+}
+
+const caseAlgById = new Map(
+  [...(pllCases ?? []), ...(ollCases ?? []), ...(f2lCases ?? []), ...(eoCases ?? [])].map((c) => [c.id, c.alg]),
+);
+for (const g of guidedF2L ?? []) {
+  const alg = caseAlgById.get(g.caseId);
+  if (!alg) {
+    failures++;
+    console.error(`FAIL guided F2L "${g.title}": unknown case ${g.caseId}`);
+    continue;
+  }
+  const joined = tokens(g.phases.map((p) => p.moves).join(" "));
+  if (joined !== tokens(alg)) {
+    failures++;
+    console.error(`FAIL guided F2L "${g.title}": phases (${joined}) != ${g.caseId} alg (${alg})`);
+  }
+  for (const p of g.phases) {
+    if (!p.echoOf) continue;
+    const ref = caseAlgById.get(p.echoOf);
+    if (!ref || tokens(p.moves) !== tokens(ref)) {
+      failures++;
+      console.error(
+        `FAIL guided F2L "${g.title}": phase "${p.moves}" claims to echo ${p.echoOf} (${ref ?? "missing"})`,
+      );
+    }
+  }
+}
+console.log(`Reasoning layer: ${(crossLessons ?? []).length} cross lessons + ${(guidedF2L ?? []).length} guided F2L solves reassemble correctly`);
+
+for (const id of Object.keys(intuitionById ?? {})) {
+  if (!allCaseIds.has(id)) {
+    failures++;
+    console.error(`FAIL intuition note: unknown case id ${id}`);
+  }
+}
+console.log(`Intuition notes: ${Object.keys(intuitionById ?? {}).length} ids validated`);
 for (const stage of learnStages ?? []) {
   for (const id of stage.trackIds) {
     if (!allCaseIds.has(id)) {

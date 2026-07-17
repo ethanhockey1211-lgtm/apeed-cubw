@@ -154,10 +154,11 @@ export default function Landing() {
               transition={{ duration: 0.5, delay: 0.12 }}
               className="mt-5 max-w-md text-base leading-relaxed text-muted sm:text-lg"
             >
-              CFOP is the method behind nearly every speedcubing world record.
-              Learn it the modern way — every one of the {totalCases || 119}{" "}
-              cases on a real, interactive 3D cube. No static diagrams, no 2012
-              forum energy.
+              CFOP is the method behind nearly every speedcubing world record —
+              and it's learnable by reasoning, not rote. Guided solves that
+              explain <em>why</em> every move happens, a cube you can drive yourself,
+              and all {totalCases || 119} cases on real 3D cubes when you want
+              them. No static diagrams, no 2012 forum energy.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 16 }}

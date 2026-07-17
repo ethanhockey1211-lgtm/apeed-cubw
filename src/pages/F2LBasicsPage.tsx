@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import LessonShell from "../components/LessonShell";
 import AlgCard from "../components/AlgCard";
-import TwistyCube from "../components/TwistyCube";
-import LazyMount from "../components/LazyMount";
-import { f2lBasicIds } from "../data/learn";
+import GuidedSolve from "../components/GuidedSolve";
+import CubePlayground from "../components/CubePlayground";
+import { f2lBasicIds, guidedF2L } from "../data/learn";
 import { sectionById } from "../data/sections";
 import { f2lCases } from "../data/f2l";
+import { invertMoves } from "../lib/moves";
 import { useProgress } from "../lib/progress";
 
 const ideas = [
@@ -33,11 +35,14 @@ const rules = [
 
 export default function F2LBasicsPage() {
   const { countLearned } = useProgress();
+  const [practiceCase, setPracticeCase] = useState<string | null>(null);
   const section = sectionById.f2l;
   const basics = f2lBasicIds
     .map((id) => f2lCases.find((c) => c.id === id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
-  const example = f2lCases.find((c) => c.id === "f2l-5");
+  const practiceAlg = practiceCase
+    ? f2lCases.find((c) => c.id === practiceCase)?.alg
+    : undefined;
 
   return (
     <LessonShell
@@ -95,51 +100,96 @@ export default function F2LBasicsPage() {
         </div>
       </section>
 
-      {/* Derivation example */}
-      {example && (
-        <section className="mt-14 overflow-hidden rounded-2xl border border-line bg-surface">
-          <div className="grid md:grid-cols-2">
-            <div className="p-6 sm:p-8">
-              <p className="font-display text-sm font-bold tracking-wide text-cube-blue uppercase">
-                See the reduction
-              </p>
-              <h2 className="mt-1 font-display text-2xl font-bold tracking-tight">
-                A “new” case that isn't
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                Here the pair starts split: corner at the front-right, edge at
-                the back. Watch the first two moves — they don't insert anything,
-                they just <em>set up</em>: pull the corner out of the way and bring the
-                edge around. By move three you're looking at a basic insert you
-                already know.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                That's the whole trick to intuitive F2L. Ask: <em>what's stopping
-                this pair from being basic?</em> Fix that with the free top layer, then
-                insert. Step through it move by move and find the moment it
-                becomes case #1.
-              </p>
-              <div className="mt-4 rounded-xl bg-surface-2/70 px-4 py-3">
-                <p className="font-mono text-sm">{example.alg}</p>
+      {/* Guided solves with reasoning */}
+      <section className="mt-14">
+        <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+          Five solves that teach everything
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+          Every one of the 41 F2L positions is one of these five stories. Press
+          play and follow the reasoning, not the letters — each chunk of moves
+          lights up with <em>why</em> it happens. When a step is tagged{" "}
+          <span className="rounded-full bg-cube-green/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-cube-green uppercase">
+            a basic insert
+          </span>{" "}
+          that's not a figure of speech: it's move-for-move one of the four
+          inserts above, verified by machine.
+        </p>
+        <div className="mt-6 space-y-5">
+          {guidedF2L.map((g, i) => (
+            <motion.article
+              key={g.caseId}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4 }}
+              className="rounded-2xl border border-line bg-surface p-5 sm:p-6"
+            >
+              <div className="mb-4 max-w-2xl">
+                <p className="font-display text-sm font-bold text-cube-blue">
+                  Story {i + 1} of {guidedF2L.length}
+                </p>
+                <h3 className="mt-0.5 font-display text-lg font-bold tracking-tight">{g.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{g.story}</p>
               </div>
-            </div>
-            <div className="flex items-center justify-center bg-surface-2/40 p-6">
-              <div className="aspect-square w-full max-w-[300px]">
-                <LazyMount className="h-full w-full">
-                  <TwistyCube
-                    alg={example.alg}
-                    setupAlg="z2"
-                    stickeringMask={section.stickeringMask}
-                    tempo={0.8}
-                    label="An F2L case reducing to a basic insert"
-                    className="h-full"
-                  />
-                </LazyMount>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+              <GuidedSolve
+                phases={g.phases}
+                setupAlg="z2"
+                stickeringMask={section.stickeringMask}
+                accent="blue"
+                label={`Guided F2L solve: ${g.title}`}
+              />
+            </motion.article>
+          ))}
+        </div>
+      </section>
+
+      {/* Practice sandbox */}
+      <section className="mt-14">
+        <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+          Now you — no algorithms allowed
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+          Load one of the five cases and solve the pair with your own hands:
+          find both pieces, ask what's blocking them, fix it, insert. Undo is
+          free, resets are free, nothing can break. The last layer is grayed
+          out on purpose — when no colored sticker is out of place, the pair is
+          home. <em>Your</em> way counts even if it isn't the shortest.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setPracticeCase(null)}
+            className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors ${
+              practiceCase === null
+                ? "border-transparent bg-ink text-bg"
+                : "border-line text-muted hover:border-line-strong hover:text-ink"
+            }`}
+          >
+            Free play
+          </button>
+          {guidedF2L.map((g) => (
+            <button
+              key={g.caseId}
+              type="button"
+              onClick={() => setPracticeCase(g.caseId)}
+              className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                practiceCase === g.caseId
+                  ? "border-transparent bg-ink text-bg"
+                  : "border-line text-muted hover:border-line-strong hover:text-ink"
+              }`}
+            >
+              {g.title}
+            </button>
+          ))}
+        </div>
+        <CubePlayground
+          key={practiceCase ?? "free"}
+          setup={practiceAlg ? invertMoves(practiceAlg) : ""}
+          stickeringMask={practiceAlg ? section.stickeringMask : undefined}
+          className="mt-4"
+        />
+      </section>
 
       {/* Golden rules */}
       <section className="mt-14 max-w-2xl">

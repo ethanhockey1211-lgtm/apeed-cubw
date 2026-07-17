@@ -1,6 +1,6 @@
 import LessonShell from "../components/LessonShell";
 import AlgCard from "../components/AlgCard";
-import { EO_MASK, eoCases, ocllCases, twoLookOllIds } from "../data/learn";
+import { EO_MASK, eoCases, intuitionById, ocllCases, twoLookOllIds } from "../data/learn";
 import { sectionById } from "../data/sections";
 import { useProgress } from "../lib/progress";
 
@@ -39,7 +39,13 @@ export default function TwoLookOllPage() {
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {eoCases.map((c) => (
-            <AlgCard key={c.id} algCase={c} accent="yellow" stickeringMask={EO_MASK} />
+            <AlgCard
+              key={c.id}
+              algCase={c}
+              accent="yellow"
+              stickeringMask={EO_MASK}
+              intuition={intuitionById[c.id]}
+            />
           ))}
         </div>
         <p className="mt-4 max-w-2xl text-xs leading-relaxed text-faint">
@@ -71,6 +77,7 @@ export default function TwoLookOllPage() {
               accent="yellow"
               stickering={oll.stickering}
               stickeringMask={oll.stickeringMask}
+              intuition={intuitionById[c.id]}
             />
           ))}
         </div>

@@ -18,6 +18,14 @@ export interface AlgCase {
   difficulty: Difficulty;
 }
 
+/** One reasoning chunk of a guided solve: a few moves plus the intent behind them. */
+export interface SolvePhase {
+  moves: string;
+  intent: string;
+  /** Set when this phase is literally another case's algorithm (checked by verify-algs) */
+  echoOf?: string;
+}
+
 export interface CaseGroup {
   id: string;
   name: string;

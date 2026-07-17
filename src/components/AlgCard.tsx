@@ -80,9 +80,17 @@ interface AlgCardProps {
   /** cubing.js stickering / mask, same semantics as SectionDef */
   stickering?: string;
   stickeringMask?: string;
+  /** “Why it works” — the alg decomposed into known triggers */
+  intuition?: string;
 }
 
-function AlgCardInner({ algCase, accent: accentColor, stickering = "full", stickeringMask }: AlgCardProps) {
+function AlgCardInner({
+  algCase,
+  accent: accentColor,
+  stickering = "full",
+  stickeringMask,
+  intuition,
+}: AlgCardProps) {
   const { isLearned, toggle } = useProgress();
   const learned = isLearned(algCase.id);
   const [activeMove, setActiveMove] = useState<number | null>(null);
@@ -187,6 +195,27 @@ function AlgCardInner({ algCase, accent: accentColor, stickering = "full", stick
             {algCase.recognition}
           </span>
         </p>
+        {intuition && (
+          <p className="flex gap-2 text-xs leading-relaxed text-muted">
+            <svg
+              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cube-yellow"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M9 18h6M10 21h4" />
+              <path d="M12 3a6 6 0 0 0-4 10.5c.8.7 1.3 1.5 1.5 2.5h5c.2-1 .7-1.8 1.5-2.5A6 6 0 0 0 12 3z" />
+            </svg>
+            <span>
+              <span className="font-semibold text-ink/80">Why it works: </span>
+              {intuition}
+            </span>
+          </p>
+        )}
       </div>
     </motion.article>
   );

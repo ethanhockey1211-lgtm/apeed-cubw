@@ -13,6 +13,17 @@ principles and worked example solves.
   → 2-Look PLL (6 algs, the "you now solve with CFOP" milestone) → full PLL
   → full OLL → F2L refinement. Stage progress is computed from the same
   learned-case ids as the sections, so the two views never disagree
+- **Guided solves (reasoning-first learning)** — cross examples and five
+  canonical F2L solves play with a live "why" caption per chunk of moves;
+  when a chunk is tagged "a basic insert" the claim is machine-verified
+  (the moves are literally that case's algorithm). Cross captions are
+  grounded in per-move solved-edge counts from the verify script
+- **Practice sandbox** — a button-driven virtual cube (with undo/reset) for
+  free experimentation on the notation page, and case-loading on the F2L
+  course so you solve pairs with your own hands, last layer masked
+- **"Why it works" notes** — 2-look algorithms decomposed into known
+  triggers (F-sandwich, sexy move, sledgehammer, M-U shuttles), shown on
+  lesson and section cards alike
 - **Notation school** — every move family (faces, primes/doubles, slices,
   wide moves, rotations) demonstrated on a tap-to-play 3D cube, plus an
   annotated walkthrough of R U R' U' with live move highlighting

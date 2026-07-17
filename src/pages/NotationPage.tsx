@@ -5,6 +5,7 @@ import MoveDemo from "../components/MoveDemo";
 import TwistyCube from "../components/TwistyCube";
 import AlgNotation from "../components/AlgNotation";
 import MarkLearnedButton from "../components/MarkLearnedButton";
+import CubePlayground from "../components/CubePlayground";
 import { notationGroups, SEXY_MOVE } from "../data/learn";
 
 export default function NotationPage() {
@@ -112,6 +113,19 @@ export default function NotationPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Free play */}
+      <section className="mt-14">
+        <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+          Free play — drive it yourself
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+          Reading about moves isn't knowing them. Tap buttons, watch layers
+          turn, guess what a move will do <em>before</em> pressing it. Try: what does{" "}
+          <span className="font-mono text-ink/90">R U R' U'</span> six times in a row do?
+        </p>
+        <CubePlayground className="mt-5" />
       </section>
 
       {/* Mark done */}

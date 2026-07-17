@@ -1,4 +1,4 @@
-import type { AccentColor, AlgCase } from "../lib/types";
+import type { AccentColor, AlgCase, SolvePhase } from "../lib/types";
 // Explicit .ts extensions so scripts/verify-algs.mjs can import this file
 // under Node's --experimental-strip-types (extensionless value imports fail).
 import { ollCases } from "./oll.ts";
@@ -78,6 +78,125 @@ export const twoLookPllIds = [...tlPllCornerCases, ...tlPllEdgeCases].map((c) =>
 
 /* ——— F2L foundations: the four basic inserts, by id ——— */
 export const f2lBasicIds = ["f2l-1", "f2l-2", "f2l-3", "f2l-4"];
+
+/*
+ * ——— Guided F2L solves: algorithms with the reasoning attached ———
+ * Each phase's moves concatenate to exactly the referenced case's verified
+ * algorithm (checked by scripts/verify-algs.mjs). Where a phase carries
+ * `echoOf`, its moves are literally that case's algorithm — machine-proof
+ * that "every case reduces to a basic insert" isn't just a slogan.
+ */
+export interface GuidedExample {
+  caseId: string;
+  title: string;
+  story: string;
+  phases: SolvePhase[];
+}
+
+export const guidedF2L: GuidedExample[] = [
+  {
+    caseId: "f2l-3",
+    title: "The premade pair",
+    story:
+      "Corner and edge are already locked together with matching colors. All that's left is the door: open the slot, carry the pair over it, close.",
+    phases: [
+      { moves: "R", intent: "Open the slot — its empty corner spot swings up into the top layer." },
+      { moves: "U", intent: "Carry the pair across the top so it sits over the opening." },
+      { moves: "R'", intent: "Close the slot. Pair home, cross untouched." },
+    ],
+  },
+  {
+    caseId: "f2l-1",
+    title: "The pair split by the slot",
+    story:
+      "The pieces are next to each other but the slot's own turn would rip them apart. So: step aside, open, come back, close. This four-move shape is the heartbeat of F2L.",
+    phases: [
+      { moves: "U", intent: "Move the pieces aside, out of the slot's swing path." },
+      { moves: "R", intent: "Open the slot while they're safely out of the way." },
+      { moves: "U'", intent: "Bring them back — now they drop together into the opening." },
+      { moves: "R'", intent: "Close. Borrow, use, give back: that's every F2L insert." },
+    ],
+  },
+  {
+    caseId: "f2l-5",
+    title: "Both on top, not yet a pair",
+    story:
+      "Corner and edge are both in the top layer but not joined. Phase one builds the pair; phase two is an insert you could do in your sleep.",
+    phases: [
+      {
+        moves: "U' R U R' U2",
+        intent:
+          "Build the pair: walk the corner and edge around the free top layer until they lock together, colors matching.",
+      },
+      { moves: "R U' R'", intent: "Insert: open the slot, drop the finished pair in, close." },
+    ],
+  },
+  {
+    caseId: "f2l-17",
+    title: "White facing the sky",
+    story:
+      "The hardest-looking family: the corner's white sticker points straight up, so no pair can form. The fix is one motion — roll the corner over the top — and suddenly it's a case you already know.",
+    phases: [
+      {
+        moves: "R U2 R'",
+        intent:
+          "The roll: hoist the corner up and flip it over with a double turn. White stops pointing at the sky, and the pair snaps together.",
+      },
+      { moves: "U'", intent: "Line the fresh pair up over its slot." },
+      {
+        moves: "R U R'",
+        echoOf: "f2l-3",
+        intent: "…and this is literally basic insert #3, move for move. New case, old ending.",
+      },
+    ],
+  },
+  {
+    caseId: "f2l-31",
+    title: "A piece stuck in the slot",
+    story:
+      "The corner is sitting in its slot — even correctly! — but its edge isn't with it, so it has to come out. Eject it onto the top layer and you're left staring at a basic insert.",
+    phases: [
+      {
+        moves: "U R U' R'",
+        intent:
+          "Evict politely: open the slot, lift the lonely corner out onto the top layer next to its edge, close behind it.",
+      },
+      {
+        moves: "U' F' U F",
+        echoOf: "f2l-2",
+        intent: "What remains is exactly basic insert #2. Stuck pieces don't need new algorithms — just an exit.",
+      },
+    ],
+  },
+];
+
+/*
+ * ——— “Why it works” intuition notes ———
+ * Structural decompositions into triggers the learner already knows, keyed by
+ * case id and rendered wherever that case appears. These turn memorization
+ * into chunking — you remember 2–3 triggers, not 14 letters.
+ */
+export const intuitionById: Record<string, string> = {
+  // 2-look OLL edges: all three are the same F-sandwich
+  "eo-line": "A conjugate: F lends the bottom-layer machinery to the top, the sexy move flips two edges, F' puts everything back.",
+  "eo-l": "The same F-sandwich as Line with the filling stirred — U R U' R' instead of R U R' U'. One sandwich, two fillings.",
+  "eo-dot": "Nothing new: it's the Line alg, then the L alg. The wide f just builds the re-grip into the move.",
+  // OCLL
+  "oll-27": "The friendliest algorithm on the cube: trigger (R U R'), kick (U), then the same trigger with a double twist (R U2 R'). Learn it as a rhythm, not letters.",
+  "oll-26": "Sune played backwards — it's the exact inverse. If you can undo a Sune, you know this one already.",
+  "oll-21": "Nicknamed Double Sune: Sune's rhythm run twice in one breath.",
+  "oll-22": "Lives entirely on R and U — three R2 flicks in a row carry the whole thing.",
+  "oll-23": "A conjugate with D: tuck one corner downstairs (D'), twist the others up top, then bring it back (D).",
+  "oll-24": "Fat sexy move (r U R' U'), then hand the twist back with r' F R F'. Two chunks you already own.",
+  "oll-25": "Chameleon's twin — the same fat-sexy engine, wrapped in F' … R instead.",
+  // 2-look PLL
+  "pll-t": "Opens with the sexy move; the F-wrapped second half swaps everything back in a new order. Two triggers, zero new fingerings.",
+  "pll-y": "The entire second half is OLL's sexy + sledgehammer combo (R U R' U' R' F R F') — you drilled it already.",
+  "pll-ua": "M and U only: the M slice shuttles edges through the middle while U feeds it the next one.",
+  "pll-ub": "Ua's shuttle run in reverse — same fingertrick, opposite direction.",
+  "pll-h": "Four M2s stitched together by U turns — pure rhythm. Say “two-one-two-twotwo-two-one-two” out loud while you turn.",
+  "pll-z": "The M slice zig-zags: alternate M and U until the checkerboards unwind, then a final alignment.",
+};
 
 /* ——— Notation school ——— */
 export interface NotationMove {
