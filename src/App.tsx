@@ -5,6 +5,11 @@ import Nav from "./components/Nav";
 import Landing from "./pages/Landing";
 import CrossPage from "./pages/CrossPage";
 import SectionPage from "./pages/SectionPage";
+import LearnPage from "./pages/LearnPage";
+import NotationPage from "./pages/NotationPage";
+import F2LBasicsPage from "./pages/F2LBasicsPage";
+import TwoLookOllPage from "./pages/TwoLookOllPage";
+import TwoLookPllPage from "./pages/TwoLookPllPage";
 import { sectionById } from "./data/sections";
 
 function Page({ children }: { children: React.ReactNode }) {
@@ -34,6 +39,11 @@ export default function App() {
       <AnimatePresence mode="wait" initial={false}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Page><Landing /></Page>} />
+          <Route path="/learn" element={<Page><LearnPage /></Page>} />
+          <Route path="/learn/notation" element={<Page><NotationPage /></Page>} />
+          <Route path="/learn/f2l-basics" element={<Page><F2LBasicsPage /></Page>} />
+          <Route path="/learn/2-look-oll" element={<Page><TwoLookOllPage /></Page>} />
+          <Route path="/learn/2-look-pll" element={<Page><TwoLookPllPage /></Page>} />
           <Route path="/cross" element={<Page><CrossPage /></Page>} />
           <Route path="/f2l" element={<Page><SectionPage section={sectionById.f2l} /></Page>} />
           <Route path="/oll" element={<Page><SectionPage section={sectionById.oll} /></Page>} />

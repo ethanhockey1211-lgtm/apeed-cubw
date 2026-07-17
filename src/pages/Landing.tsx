@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import TwistyCube from "../components/TwistyCube";
 import LazyMount from "../components/LazyMount";
 import { sections } from "../data/sections";
+import { learnStages, stageFraction } from "../data/learn";
 import { accents } from "../lib/accents";
 import { useProgress } from "../lib/progress";
 
@@ -62,6 +63,58 @@ const features = [
   },
 ];
 
+function GuidedPathStrip() {
+  const { isLearned } = useProgress();
+  const fractions = learnStages.map((s) => stageFraction(s, isLearned));
+  const firstIncomplete = fractions.findIndex((f) => f < 1);
+
+  return (
+    <section className="mx-auto max-w-6xl px-4 sm:px-6">
+      <motion.div {...fadeUp}>
+        <Link
+          to="/learn"
+          className="group block rounded-2xl border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_14px_44px_-14px_rgba(0,0,0,0.45)] sm:p-6"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-display text-sm font-bold tracking-wide text-cube-green uppercase">
+                New here? Don't guess the order.
+              </p>
+              <h2 className="mt-1 font-display text-xl font-bold tracking-tight sm:text-2xl">
+                The guided path: 8 stages from scrambled to speed
+              </h2>
+            </div>
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-cube-green">
+              {firstIncomplete <= 0 ? "Start stage 1" : "Continue the path"}
+              <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+            </span>
+          </div>
+          <ol className="mt-4 flex flex-wrap gap-2" aria-label="Learning stages">
+            {learnStages.map((s, i) => {
+              const done = fractions[i] === 1;
+              const isNext = i === firstIncomplete;
+              return (
+                <li
+                  key={s.id}
+                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
+                    done
+                      ? "border-cube-green/40 bg-cube-green/10 text-cube-green"
+                      : isNext
+                        ? "border-line-strong text-ink"
+                        : "border-line text-faint"
+                  }`}
+                >
+                  {done ? "✓" : `${s.step}.`} {s.title}
+                </li>
+              );
+            })}
+          </ol>
+        </Link>
+      </motion.div>
+    </section>
+  );
+}
+
 export default function Landing() {
   const { countLearned } = useProgress();
   const totalCases = sections.reduce((n, s) => n + s.cases.length, 0);
@@ -113,10 +166,10 @@ export default function Landing() {
               className="mt-8 flex flex-wrap items-center gap-3"
             >
               <Link
-                to="/cross"
+                to="/learn"
                 className="group inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
               >
-                Start learning
+                Start the guided path
                 <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
               </Link>
               <Link
@@ -148,6 +201,9 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
+
+      {/* ——— Guided path teaser ——— */}
+      <GuidedPathStrip />
 
       {/* ——— Pipeline ——— */}
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16">
@@ -265,15 +321,16 @@ export default function Landing() {
           Your first sub-20 starts here.
         </motion.h2>
         <motion.p {...fadeUp} className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted sm:text-base">
-          Start with the cross, learn F2L intuitively, then chip away at OLL
-          and PLL one case at a time.
+          Follow the guided path: notation, cross, intuitive F2L, then 16
+          algorithms to your first real CFOP solve — with honest time
+          estimates at every stage.
         </motion.p>
         <motion.div {...fadeUp} className="mt-7">
           <Link
-            to="/cross"
+            to="/learn"
             className="group inline-flex items-center gap-2 rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
           >
-            Start with the Cross
+            Start stage 1
             <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
           </Link>
         </motion.div>

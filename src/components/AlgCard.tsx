@@ -2,40 +2,10 @@ import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import TwistyCube from "./TwistyCube";
 import LazyMount from "./LazyMount";
+import AlgNotation from "./AlgNotation";
 import { accents, difficultyMeta } from "../lib/accents";
-import type { AlgCase, SectionDef } from "../lib/types";
+import type { AccentColor, AlgCase } from "../lib/types";
 import { useProgress } from "../lib/progress";
-
-function AlgNotation({
-  alg,
-  activeIndex,
-  compact = false,
-}: {
-  alg: string;
-  activeIndex: number | null;
-  compact?: boolean;
-}) {
-  const tokens = alg.split(/\s+/).filter(Boolean);
-  return (
-    <p
-      className={`font-mono leading-relaxed break-words ${compact ? "text-xs" : "text-[13px] sm:text-sm"}`}
-      aria-label={`Algorithm: ${alg}`}
-    >
-      {tokens.map((t, i) => (
-        <span
-          key={i}
-          className={`mr-[0.45em] inline-block rounded px-0.5 transition-colors duration-100 ${
-            i === activeIndex
-              ? "bg-cube-yellow/25 text-ink outline outline-cube-yellow/60"
-              : "text-ink/90"
-          }`}
-        >
-          {t}
-        </span>
-      ))}
-    </p>
-  );
-}
 
 function LearnedCheckbox({
   checked,
@@ -106,16 +76,19 @@ function DifficultyBadge({ level }: { level: AlgCase["difficulty"] }) {
 
 interface AlgCardProps {
   algCase: AlgCase;
-  section: SectionDef;
+  accent: AccentColor;
+  /** cubing.js stickering / mask, same semantics as SectionDef */
+  stickering?: string;
+  stickeringMask?: string;
 }
 
-function AlgCardInner({ algCase, section }: AlgCardProps) {
+function AlgCardInner({ algCase, accent: accentColor, stickering = "full", stickeringMask }: AlgCardProps) {
   const { isLearned, toggle } = useProgress();
   const learned = isLearned(algCase.id);
   const [activeMove, setActiveMove] = useState<number | null>(null);
   const [showAlts, setShowAlts] = useState(false);
   const [solvedPulse, setSolvedPulse] = useState(0);
-  const accent = accents[section.accent];
+  const accent = accents[accentColor];
 
   return (
     <motion.article
@@ -154,8 +127,8 @@ function AlgCardInner({ algCase, section }: AlgCardProps) {
           <TwistyCube
             alg={algCase.alg}
             setupAlg="z2"
-            stickering={section.stickering}
-            stickeringMask={section.stickeringMask}
+            stickering={stickering}
+            stickeringMask={stickeringMask}
             tempo={1.2}
             label={`3D cube showing the ${algCase.name} case`}
             onMoveIndex={setActiveMove}

@@ -8,6 +8,17 @@ principles and worked example solves.
 
 ## Features
 
+- **The guided path** (`/learn`) — an 8-stage curriculum with honest time
+  estimates: notation school → cross → intuitive F2L → 2-Look OLL (10 algs)
+  → 2-Look PLL (6 algs, the "you now solve with CFOP" milestone) → full PLL
+  → full OLL → F2L refinement. Stage progress is computed from the same
+  learned-case ids as the sections, so the two views never disagree
+- **Notation school** — every move family (faces, primes/doubles, slices,
+  wide moves, rotations) demonstrated on a tap-to-play 3D cube, plus an
+  annotated walkthrough of R U R' U' with live move highlighting
+- **2-Look lessons** — edge-orientation cases rendered with a corners-ignored
+  mask so beginners see only what matters; the 7 corner cases and all 6
+  2-look PLL algs are real full-set cases, so lesson progress carries over
 - **Interactive 3D players** — each case shows its true cube state (yellow on
   top, white cross on the bottom, like you actually hold it) and animates the
   algorithm move by move; the current move is highlighted in the notation
@@ -16,8 +27,9 @@ principles and worked example solves.
   cross (custom piece masks built for the yellow-top display frame)
 - **Progress tracking** — mark cases learned; per-section progress bars and
   nav badges persist in `localStorage`
-- **Quiz mode** — see a case state, recall the algorithm, reveal to check;
-  optional unlearned-only drilling
+- **Quiz modes** — recall (see the state, recall the alg) and recognition
+  (multiple choice: name the case). Every quiz state gets a random AUF like a
+  real solve, and cases you miss are weighted to come back more often
 - **Search & filters** — by name, nickname, notation, recognition text, or
   difficulty tag on every section
 - **Difficulty badges** — beginner-friendly vs finger-trick-heavy, so you
@@ -53,3 +65,6 @@ npm run verify    # verify every algorithm against the cubing.js kpuzzle engine
   includes a bidirectional BFS solver to propose algorithms for any gaps
 - **Cross**: each worked example is verified to solve the white cross
   relative to centers, and each scramble is verified to actually break it
+- **Guided path**: the three 2-look edge-orientation algorithms are verified
+  to preserve F2L and produce the exact line/L/dot patterns their recognition
+  tips describe, and every stage's tracked ids are checked against real cases

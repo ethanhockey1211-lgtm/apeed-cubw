@@ -24,6 +24,8 @@ interface TwistyCubeProps {
   backView?: "none" | "side-by-side" | "top-right";
   /** Loop the animation forever (used on the landing hero) */
   loop?: boolean;
+  /** Clicking (or pressing Enter on) the cube replays the alg from the start */
+  replayOnClick?: boolean;
   /** Fired when playback reaches the solved (end) state */
   onSolved?: () => void;
   /** Fired at move boundaries: index of the move being animated, or null when idle */
@@ -75,6 +77,7 @@ export default function TwistyCube({
   hintFacelets = "floating",
   backView = "none",
   loop = false,
+  replayOnClick = false,
   onSolved,
   onMoveIndex,
   className = "",
@@ -200,13 +203,32 @@ export default function TwistyCube({
     }
   };
 
+  const replay = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    player.jumpToStart();
+    player.play();
+  };
+
   return (
     <div className={`flex flex-col ${className}`}>
       <div
         ref={mountRef}
-        role="img"
+        role={replayOnClick ? "button" : "img"}
+        tabIndex={replayOnClick ? 0 : undefined}
         aria-label={label ?? `3D cube animation for ${alg}`}
-        className="min-h-0 w-full flex-1 cursor-grab active:cursor-grabbing"
+        onClick={replayOnClick ? replay : undefined}
+        onKeyDown={
+          replayOnClick
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  replay();
+                }
+              }
+            : undefined
+        }
+        className={`min-h-0 w-full flex-1 ${replayOnClick ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"}`}
       />
       {controls && (
         <div className="mt-1 flex items-center justify-center gap-1.5">

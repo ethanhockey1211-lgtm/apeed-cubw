@@ -532,6 +532,63 @@ for (const id of ["pll-ua", "pll-ub", "pll-aa", "pll-ab"]) {
   console.log(`${id}: ${positions.map((pos) => `${pos}<-${o.pieces[pos]}`).join("  ")}`);
 }
 
+// ——— Guided path: 2-look OLL edge cases + stage data integrity ———
+// Importing learn.ts also validates its internal id references (it throws on
+// a missing OCLL / 2-look-PLL case).
+const { eoCases, learnStages, twoLookOllIds, twoLookPllIds } = await import("../src/data/learn.ts");
+
+const EO_EXPECT = { "eo-line": "2opp", "eo-l": "2adj", "eo-dot": "0" };
+const sidesOfEdge = (i) =>
+  FACES.filter((f) => f !== "U" && f !== "D" && faceEdges[f].includes(i)).join("");
+// The side labels below are geometric (viewer) sides: the z2 in the display
+// setup changes which pieces sit on top but not the geometry of the pattern,
+// so R here means the viewer's right in the rendered player too.
+console.log("\nEO cases (oriented-edge sides, viewer frame):");
+for (const c of eoCases ?? []) {
+  if (!passes(caseStateFor(c.alg), checkOLL)) {
+    failures++;
+    console.error(`FAIL EO ${c.id}: ${c.alg} does not preserve F2L`);
+    continue;
+  }
+  const p = normalized(caseStateFor(c.alg));
+  const eo = orbit(p, "EDGES");
+  const oriented = U_EDGES.filter((i) => eo.orientation[i] === 0);
+  let pattern;
+  if (oriented.length === 0) pattern = "0";
+  else if (oriented.length === 4) pattern = "4";
+  else if (oriented.length === 2)
+    pattern = Math.abs(oriented[0] - oriented[1]) === 2 ? "2opp" : "2adj";
+  else pattern = `impossible(${oriented.length})`;
+  if (pattern !== EO_EXPECT[c.id]) {
+    failures++;
+    console.error(`FAIL EO ${c.id}: edge pattern ${pattern}, expected ${EO_EXPECT[c.id]}`);
+  }
+  console.log(`${c.id.padEnd(8)} ${pattern.padEnd(5)} on ${oriented.map(sidesOfEdge).join(", ") || "—"}`);
+}
+
+const allCaseIds = new Set(
+  [...(pllCases ?? []), ...(ollCases ?? []), ...(f2lCases ?? []), ...(eoCases ?? [])].map((c) => c.id),
+);
+for (const stage of learnStages ?? []) {
+  for (const id of stage.trackIds) {
+    if (!allCaseIds.has(id)) {
+      failures++;
+      console.error(`FAIL stage ${stage.id}: unknown trackId ${id}`);
+    }
+  }
+  if (stage.trackIds.length === 0 && !stage.manualId) {
+    failures++;
+    console.error(`FAIL stage ${stage.id}: neither trackIds nor manualId`);
+  }
+}
+if ((twoLookOllIds ?? []).length !== 10 || (twoLookPllIds ?? []).length !== 6) {
+  failures++;
+  console.error(
+    `FAIL 2-look sets: expected 10 OLL / 6 PLL, got ${twoLookOllIds?.length}/${twoLookPllIds?.length}`,
+  );
+}
+console.log(`Stages: checked ${(learnStages ?? []).length} stages against ${allCaseIds.size} case ids`);
+
 if (failures > 0) {
   console.error(`\n${failures} algorithm(s) FAILED verification`);
   process.exit(1);

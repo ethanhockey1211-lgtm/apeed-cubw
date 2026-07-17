@@ -179,7 +179,13 @@ export default function SectionPage({ section }: { section: SectionDef }) {
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {groupCases.map((c) => (
-                        <AlgCard key={c.id} algCase={c} section={section} />
+                        <AlgCard
+                          key={c.id}
+                          algCase={c}
+                          accent={section.accent}
+                          stickering={section.stickering}
+                          stickeringMask={section.stickeringMask}
+                        />
                       ))}
                     </div>
                   </section>

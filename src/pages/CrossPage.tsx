@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import TwistyCube from "../components/TwistyCube";
 import LazyMount from "../components/LazyMount";
+import MarkLearnedButton from "../components/MarkLearnedButton";
 import { crossLessons, crossPrinciples, WHITE_CROSS_MASK } from "../data/cross";
 
 export default function CrossPage() {
@@ -89,16 +90,24 @@ export default function CrossPage() {
       <div className="mt-14 rounded-2xl border border-line bg-surface p-6 text-center sm:p-8">
         <h2 className="font-display text-xl font-bold tracking-tight">Cross feeling smooth?</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-          Once you can plan the full cross during inspection, the next step is
-          pairing corners and edges: F2L.
+          When you can plan the whole cross during inspection and solve it in 8
+          moves or fewer without looking twice, mark the stage done — then it's
+          time to pair corners and edges.
         </p>
-        <Link
-          to="/f2l"
-          className="group mt-5 inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
-        >
-          Continue to F2L
-          <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
-        </Link>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <MarkLearnedButton
+            id="lesson-cross"
+            todoLabel="My cross is solid — mark stage 2 done"
+            doneLabel="Stage 2 complete"
+          />
+          <Link
+            to="/learn/f2l-basics"
+            className="group inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
+          >
+            Continue to intuitive F2L
+            <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
