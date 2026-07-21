@@ -2,14 +2,22 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import TwistyCube from "./TwistyCube";
 import AlgNotation from "./AlgNotation";
-import { type Facelets, applyMovesToFacelets, solvedFacelets } from "../lib/facelets3x3";
+import {
+  type Facelets,
+  applyMovesToFacelets,
+  solvedFacelets,
+} from "../lib/facelets3x3";
+import { applyMoves4, solvedFacelets4 } from "../lib/faceletsNxN";
 
-/** WCA sticker colors, indexed like FACES = [U, L, F, R, B, D]. */
+/** WCA sticker colors, indexed like the face order [U, L, F, R, B, D]. */
 const COLOR_HEX = ["#f5f5f5", "#ff5800", "#009b48", "#b71234", "#0046ad", "#ffd500"];
 const COLOR_NAMES = ["white", "orange", "green", "red", "blue", "yellow"];
 const FACE_LABELS = ["Up", "Left", "Front", "Right", "Back", "Down"];
 
-const EXAMPLE_SCRAMBLE = "F R' D2 L U' B2 D R2 F' L2 U2 B D' R U F2 L' D B2 U'";
+const EXAMPLES: Record<number, string> = {
+  3: "F R' D2 L U' B2 D R2 F' L2 U2 B D' R U F2 L' D B2 U'",
+  4: "R U' F2 Rw2 D' B R' Uw F' L2 Uw' R2 D Fw2 U' Rw B2 D2 Fw R2",
+};
 
 /** Classify a sampled RGB pixel to one of the six sticker colors. */
 function classify(r: number, g: number, b: number): number {
@@ -36,14 +44,14 @@ interface SolveResult {
   moveCount: number;
 }
 
-// Solver assets are heavy; load once and share across renders.
-let enginePromise: Promise<{
+// 3x3 solver assets, loaded once.
+let engine3Promise: Promise<{
   kpuzzle: import("cubing/kpuzzle").KPuzzle;
   faceletsToPattern: typeof import("../lib/facelets3x3").faceletsToPattern;
   solve: (p: import("cubing/kpuzzle").KPattern) => Promise<{ toString(): string }>;
 }> | null = null;
-function loadEngine() {
-  enginePromise ??= (async () => {
+function loadEngine3() {
+  engine3Promise ??= (async () => {
     const [{ cube3x3x3 }, { experimentalSolve3x3x3IgnoringCenters }, lib] = await Promise.all([
       import("cubing/puzzles"),
       import("cubing/search"),
@@ -53,21 +61,26 @@ function loadEngine() {
     await lib.initFaceletEngine(kpuzzle);
     return { kpuzzle, faceletsToPattern: lib.faceletsToPattern, solve: experimentalSolve3x3x3IgnoringCenters };
   })();
-  return enginePromise;
+  return engine3Promise;
 }
 
 function FaceGrid({
+  n,
   face,
   facelets,
+  lockCenter,
   onPaint,
   onPhoto,
 }: {
+  n: number;
   face: number;
   facelets: Facelets;
+  lockCenter: boolean;
   onPaint: (face: number, cell: number) => void;
   onPhoto: (face: number, file: File) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const locked = (cell: number) => lockCenter && n === 3 && cell === 4;
   return (
     <div className="flex flex-col items-center gap-1">
       <div className="flex items-center gap-1.5">
@@ -95,16 +108,16 @@ function FaceGrid({
           }}
         />
       </div>
-      <div className="grid grid-cols-3 gap-0.5 rounded-md bg-black/40 p-0.5">
+      <div className={`grid gap-0.5 rounded-md bg-black/40 p-0.5 ${n === 3 ? "grid-cols-3" : "grid-cols-4"}`}>
         {facelets[face].map((color, cell) => (
           <button
             key={cell}
             type="button"
-            disabled={cell === 4}
+            disabled={locked(cell)}
             onClick={() => onPaint(face, cell)}
-            aria-label={`${FACE_LABELS[face]} sticker ${cell + 1}: ${COLOR_NAMES[color]}${cell === 4 ? " (center, fixed)" : ""}`}
-            className={`h-6 w-6 rounded-[3px] transition-transform sm:h-7 sm:w-7 ${
-              cell === 4 ? "cursor-default opacity-90" : "hover:scale-110 active:scale-95"
+            aria-label={`${FACE_LABELS[face]} sticker ${cell + 1}: ${COLOR_NAMES[color]}${locked(cell) ? " (center, fixed)" : ""}`}
+            className={`rounded-[3px] transition-transform ${n === 3 ? "h-6 w-6 sm:h-7 sm:w-7" : "h-5 w-5 sm:h-6 sm:w-6"} ${
+              locked(cell) ? "cursor-default opacity-90" : "hover:scale-110 active:scale-95"
             }`}
             style={{ backgroundColor: COLOR_HEX[color] }}
           />
@@ -115,18 +128,27 @@ function FaceGrid({
 }
 
 /**
- * Paint (or photograph) your real cube's stickers, get an actual computed
- * solution from the cubing.js two-phase solver. Every solution is
- * double-checked against the engine before it's shown.
+ * Paint (or photograph) your real cube's stickers and get a genuine computed
+ * solution — the two-phase solver for 3x3, the TNoodle three-phase engine
+ * plus a verified 3x3 finish for 4x4. Every solution is machine-checked
+ * before it is shown.
  */
 export default function StateSolver() {
-  const [facelets, setFacelets] = useState<Facelets>(solvedFacelets);
+  const [n, setN] = useState<3 | 4>(4);
+  const [facelets, setFacelets] = useState<Facelets>(() => solvedFacelets4());
   const [selected, setSelected] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<SolveResult | null>(null);
   const [activeMove, setActiveMove] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const reset = (size: 3 | 4) => {
+    setN(size);
+    setFacelets(size === 3 ? solvedFacelets() : solvedFacelets4());
+    setResult(null);
+    setErrors([]);
+  };
 
   const paint = (face: number, cell: number) => {
     setResult(null);
@@ -148,18 +170,18 @@ export default function StateSolver() {
       const grid = size * 0.62;
       const start = (size - grid) / 2;
       const next = facelets.map((r) => r.slice());
-      for (let row = 0; row < 3; row++) {
-        for (let col = 0; col < 3; col++) {
-          const cell = row * 3 + col;
-          if (cell === 4) continue; // center stays the face color
-          const cx = Math.round(start + (col + 0.5) * (grid / 3));
-          const cy = Math.round(start + (row + 0.5) * (grid / 3));
+      for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
+          const cell = row * n + col;
+          if (n === 3 && cell === 4) continue; // 3x3 center defines the face
+          const cx = Math.round(start + (col + 0.5) * (grid / n));
+          const cy = Math.round(start + (row + 0.5) * (grid / n));
           const d = ctx.getImageData(cx - 4, cy - 4, 9, 9).data;
-          let r = 0, g = 0, b = 0, n = 0;
+          let r = 0, g = 0, b = 0, cnt = 0;
           for (let i = 0; i < d.length; i += 4) {
-            r += d[i]; g += d[i + 1]; b += d[i + 2]; n++;
+            r += d[i]; g += d[i + 1]; b += d[i + 2]; cnt++;
           }
-          next[face][cell] = classify(r / n, g / n, b / n);
+          next[face][cell] = classify(r / cnt, g / cnt, b / cnt);
         }
       }
       setFacelets(next);
@@ -176,24 +198,33 @@ export default function StateSolver() {
     setResult(null);
     setCopied(false);
     try {
-      const { kpuzzle, faceletsToPattern, solve: run } = await loadEngine();
-      const built = faceletsToPattern(kpuzzle, facelets);
-      if (!built.ok || !built.pattern) {
-        setErrors(built.errors);
-        return;
+      if (n === 3) {
+        const { kpuzzle, faceletsToPattern, solve: run } = await loadEngine3();
+        const built = faceletsToPattern(kpuzzle, facelets);
+        if (!built.ok || !built.pattern) {
+          setErrors(built.errors);
+          return;
+        }
+        const solution = (await run(built.pattern)).toString();
+        const after = built.pattern.applyAlg(solution);
+        const solved = ["EDGES", "CORNERS"].every((orbitName) => {
+          const o = after.patternData[orbitName];
+          return o.pieces.every((p: number, i: number) => p === i && o.orientation[i] === 0);
+        });
+        if (!solved) {
+          setErrors(["The solver returned an unusable solution — please report this state."]);
+          return;
+        }
+        setResult({ solution, moveCount: solution.split(/\s+/).filter(Boolean).length });
+      } else {
+        const { solve4x4 } = await import("../lib/solver4x4");
+        const res = await solve4x4(facelets);
+        if (!res.ok || !res.solution) {
+          setErrors(res.errors);
+          return;
+        }
+        setResult({ solution: res.solution, moveCount: res.moveCount ?? 0 });
       }
-      const solution = (await run(built.pattern)).toString();
-      // Belt and suspenders: prove the solution before showing it.
-      const after = built.pattern.applyAlg(solution);
-      const solved = ["EDGES", "CORNERS"].every((orbitName) => {
-        const o = after.patternData[orbitName];
-        return o.pieces.every((p: number, i: number) => p === i && o.orientation[i] === 0);
-      });
-      if (!solved) {
-        setErrors(["The solver returned an unusable solution — please report this state."]);
-        return;
-      }
-      setResult({ solution, moveCount: solution.split(/\s+/).filter(Boolean).length });
       setActiveMove(null);
     } catch {
       setErrors(["The solver failed to load. Check your connection and try again."]);
@@ -203,7 +234,11 @@ export default function StateSolver() {
   };
 
   const loadExample = () => {
-    setFacelets(applyMovesToFacelets(solvedFacelets(), EXAMPLE_SCRAMBLE));
+    setFacelets(
+      n === 3
+        ? applyMovesToFacelets(solvedFacelets(), EXAMPLES[3])
+        : applyMoves4(solvedFacelets4(), EXAMPLES[4]),
+    );
     setResult(null);
     setErrors([]);
   };
@@ -212,17 +247,34 @@ export default function StateSolver() {
     <div className="overflow-hidden rounded-2xl border border-line bg-surface">
       <div className="grid lg:grid-cols-[1fr_auto]">
         <div className="p-5 sm:p-6">
+          <div className="mb-4 flex gap-2">
+            {([4, 3] as const).map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => reset(size)}
+                aria-pressed={n === size}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                  n === size
+                    ? "border-transparent bg-ink text-bg"
+                    : "border-line text-muted hover:border-line-strong hover:text-ink"
+                }`}
+              >
+                {size}×{size}
+              </button>
+            ))}
+          </div>
           {/* Net */}
           <div className="grid w-fit grid-cols-4 gap-2">
             <div />
-            <FaceGrid face={0} facelets={facelets} onPaint={paint} onPhoto={photo} />
+            <FaceGrid n={n} face={0} facelets={facelets} lockCenter onPaint={paint} onPhoto={photo} />
             <div />
             <div />
             {[1, 2, 3, 4].map((face) => (
-              <FaceGrid key={face} face={face} facelets={facelets} onPaint={paint} onPhoto={photo} />
+              <FaceGrid key={face} n={n} face={face} facelets={facelets} lockCenter onPaint={paint} onPhoto={photo} />
             ))}
             <div />
-            <FaceGrid face={5} facelets={facelets} onPaint={paint} onPhoto={photo} />
+            <FaceGrid n={n} face={5} facelets={facelets} lockCenter onPaint={paint} onPhoto={photo} />
           </div>
         </div>
 
@@ -246,10 +298,22 @@ export default function StateSolver() {
             </div>
           </div>
           <p className="text-xs leading-relaxed text-faint">
-            Hold your cube <strong className="text-muted">white on top, green facing you</strong> and
-            copy each face — or tap 📷 on a face and photograph it straight-on
-            (fill the frame, even light). Fix any wrong sticker by tapping it.
-            Centers are fixed; they're what defines each face.
+            {n === 3 ? (
+              <>
+                Hold your cube <strong className="text-muted">white on top, green facing you</strong>{" "}
+                and copy each face — or tap 📷 on a face and photograph it
+                straight-on. Fix any wrong sticker by tapping it. Centers are
+                fixed; they define each face.
+              </>
+            ) : (
+              <>
+                Hold your 4×4 any way you like and <strong className="text-muted">keep that grip</strong>{" "}
+                while you copy all six sides (tilt, don't re-grip). Tap 📷 per
+                face to fill from a photo, then fix any sticker the camera got
+                wrong. On a 4×4 even centers move, so every sticker is
+                paintable.
+              </>
+            )}
           </p>
           <div className="mt-auto flex flex-wrap gap-2">
             <button
@@ -262,11 +326,7 @@ export default function StateSolver() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                setFacelets(solvedFacelets());
-                setResult(null);
-                setErrors([]);
-              }}
+              onClick={() => reset(n)}
               className="rounded-xl border border-line px-4 py-2.5 text-xs font-bold text-muted transition-colors hover:bg-surface-2"
             >
               Reset
@@ -307,6 +367,7 @@ export default function StateSolver() {
                 <div className="aspect-square w-full max-w-[280px]">
                   <TwistyCube
                     key={result.solution}
+                    puzzle={n === 3 ? "3x3x3" : "4x4x4"}
                     alg={result.solution}
                     setupAnchor="end"
                     tempo={1.2}
@@ -339,14 +400,14 @@ export default function StateSolver() {
                     {copied ? "Copied ✓" : "Copy"}
                   </button>
                 </div>
-                <div className="mt-3 rounded-xl bg-surface-2/70 px-4 py-3">
+                <div className="mt-3 max-h-56 overflow-y-auto rounded-xl bg-surface-2/70 px-4 py-3">
                   <AlgNotation alg={result.solution} activeIndex={activeMove} />
                 </div>
                 <p className="mt-3 text-xs leading-relaxed text-muted">
-                  This is a genuine computed solution (not a scramble replay) —
-                  verified against the engine before being shown. Hold your cube{" "}
-                  <strong className="text-ink/80">white top, green front</strong> and follow along;
-                  the current move lights up as the animation plays.
+                  A genuine computed solution, machine-verified before display.
+                  Hold your cube exactly as you painted it and follow along —{" "}
+                  <span className="font-mono">x y z</span> tokens mean “turn the whole cube”, and the
+                  current move lights up as the animation plays.
                 </p>
               </div>
             </div>

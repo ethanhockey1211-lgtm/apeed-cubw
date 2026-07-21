@@ -846,6 +846,41 @@ const { twoOllCases, twoPblCases, fourCases, pyraCases } = await import("../src/
   }
 }
 
+// ——— 4x4 state solver: end-to-end proof on random states ———
+{
+  const { initSolver4x4, solve4x4 } = await import("../src/lib/solver4x4.ts");
+  const { applyMoves4, solvedFacelets4 } = await import("../src/lib/faceletsNxN.ts");
+  await initSolver4x4();
+  const MOVES4 = ["U","U'","U2","D","D'","F","F'","F2","B","B'","R","R'","R2","L","L'","Uw","Uw'","Uw2","Dw","Fw","Fw'","Bw","Rw","Rw'","Rw2","Lw"];
+  let seed4 = 777;
+  const rnd4 = () => ((seed4 = (seed4 * 1103515245 + 12345) & 0x7fffffff), seed4 / 0x7fffffff);
+  let solved4 = 0;
+  let moves4 = 0;
+  for (let i = 0; i < 6; i++) {
+    const scr = Array.from({ length: 40 }, () => MOVES4[Math.floor(rnd4() * MOVES4.length)]).join(" ");
+    const res = await solve4x4(applyMoves4(solvedFacelets4(), scr));
+    if (res.ok) {
+      solved4++;
+      moves4 += res.moveCount;
+    } else {
+      failures++;
+      console.error(`FAIL 4x4 solver on random state #${i}: ${res.errors.join(" | ")}`);
+    }
+  }
+  // a twisted-corner paint job must be rejected, not mis-solved
+  const twisted = solvedFacelets4();
+  const t0c = twisted[0][0];
+  twisted[0][0] = twisted[2][0];
+  twisted[2][0] = twisted[3][2];
+  twisted[3][2] = t0c;
+  const bad = await solve4x4(twisted);
+  if (bad.ok) {
+    failures++;
+    console.error("FAIL 4x4 solver: twisted corner accepted");
+  }
+  console.log(`4x4 state solver: ${solved4}/6 random states solved end-to-end (avg ${Math.round(moves4 / Math.max(solved4, 1))} moves), invalid paint rejected`);
+}
+
 if (failures > 0) {
   console.error(`\n${failures} algorithm(s) FAILED verification`);
   process.exit(1);

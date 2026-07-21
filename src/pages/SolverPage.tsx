@@ -13,24 +13,26 @@ export default function SolverPage() {
           Solve my cube
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
-          Two ways in: photograph or paint your 3×3's stickers and get a real
-          computed solution, or paste the scramble string from your timer app
-          for any cube from 2×2 to 5×5. Every solution is verified against the
-          puzzle engine before you see it.
+          Two ways in: photograph or paint your cube's stickers — 3×3 or 4×4 —
+          and get a real computed solution, or paste the scramble string from
+          your timer app for any cube from 2×2 to 5×5. Every solution is
+          verified against the puzzle engine before you see it.
         </p>
       </div>
 
       {/* State solver */}
       <section className="mt-10">
         <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-          From a photo or by hand — 3×3
+          From a photo or by hand — 3×3 and 4×4
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           No scramble string needed: enter your cube exactly as it looks. Tap
           📷 on each face to fill it from a photo (then fix any sticker the
-          camera got wrong), or paint the stickers directly. The solver
-          computes a fresh solution for that exact state — usually around 20
-          moves.
+          camera got wrong), or paint the stickers directly. The 3×3 solves in
+          ~20 moves with a two-phase solver; the 4×4 runs the same three-phase
+          engine that generates official competition scrambles, then finishes
+          with the verified 3×3 pipeline — about 45 moves, computed in a few
+          seconds, machine-checked before you see it.
         </p>
         <div className="mt-5">
           <StateSolver />
@@ -53,22 +55,24 @@ export default function SolverPage() {
         </div>
       </section>
 
-      {/* Honest limits */}
+      {/* How it works */}
       <section className="mt-14 max-w-2xl rounded-2xl border border-line bg-surface p-5 sm:p-6">
         <h2 className="font-display text-base font-bold tracking-tight">
-          Why no photo solver for the 4×4?
+          How the 4×4 solver works (and why you can trust it)
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Honest answer: computing a solution for an <em>arbitrary</em> 4×4 state is a
-          server-grade search problem — its state space is about 7×10⁴⁵, and no
-          in-browser engine can crack it. What always works: keep the scramble
-          string (every timer shows one) and use the tool above — or better,
-          learn{" "}
+          An arbitrary 4×4 has ~7×10⁴⁵ states, so this runs the TNoodle
+          three-phase engine — the same solver behind official WCA competition
+          scrambles — to reduce your cube (centers, then edge pairing), then
+          finishes it as a 3×3. Every mapping between your painted stickers
+          and the engine was calibrated by machine observation, and every
+          solution is replayed on an independent simulator before display: if
+          the final state isn't six uniform faces, you get an error instead of
+          a wrong answer. Rather learn to do it yourself?{" "}
           <Link to="/puzzles/4x4" className="font-semibold text-cube-orange hover:underline">
-            the 4×4 reduction method
-          </Link>
-          , which needs exactly three algorithms beyond your 3×3 skills. For
-          the 3×3, the photo solver is the real deal.
+            The reduction method
+          </Link>{" "}
+          needs just three algorithms beyond your 3×3 skills.
         </p>
       </section>
     </div>

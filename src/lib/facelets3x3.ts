@@ -68,7 +68,7 @@ const faceCw = (x: number) => [
 ];
 
 /** Side-sticker 4-cycles per move (destination-last order: each list rotates one step). */
-const MOVE_CYCLES: Record<string, number[][]> = {
+export const MOVE_CYCLES: Record<string, number[][]> = {
   U: [
     ...faceCw(U),
     [f(F, 0), f(L, 0), f(B, 0), f(R, 0)],

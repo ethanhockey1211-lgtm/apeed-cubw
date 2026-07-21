@@ -58,16 +58,21 @@ principles and worked example solves.
   retraced in reverse — correct by construction), with strict notation
   validation and an optional "moves you've made since" field that gets
   unwound too
-- **Photo & paint state solver** (`/solver`) — enter a 3×3 exactly as it
-  looks (per-face photo auto-fill with tap-to-fix, or paint the net) and
-  get a genuine computed solution (~20 moves) from the cubing.js two-phase
-  solver. The facelet→state engine derives its orientation conventions
-  empirically and is cross-checked against an independent geometric
-  simulator on 500+ random states in `npm run verify`; unsolvable paint
-  jobs (twists, flips, swaps, miscounts) are rejected with specific
-  messages, and every solution is re-verified against the engine before
-  display. 4×4 photo solving is deliberately absent — arbitrary-state 4×4
-  is beyond any in-browser engine, and the page says so honestly
+- **Photo & paint state solver** (`/solver`) — enter a 3×3 or 4×4 exactly
+  as it looks (per-face photo auto-fill with tap-to-fix, or paint the net)
+  and get a genuine computed solution. 3×3: ~20 moves via the cubing.js
+  two-phase solver. 4×4: ~45 moves via the TNoodle three-phase engine (the
+  WCA scramble solver, unlocked from cubing.js's lazy chunk by a
+  postinstall patch) reducing centers+edges, then the verified 3×3
+  pipeline finishing, with machine-verified parity algorithms as safety
+  net. Nothing is assumed about either engine's internals: piece
+  numbering, orientation conventions and TNoodle's symmetry frames are
+  calibrated at runtime by driving the engines in tandem with an
+  independent geometric simulator (which itself must reproduce the
+  hand-verified 3×3 move tables to initialize). `npm run verify` proves
+  the whole pipeline on random states end-to-end, and every solution is
+  replayed on the simulator before display — a wrong answer cannot be
+  shown
 
 ## Stack
 
