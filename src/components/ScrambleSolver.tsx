@@ -33,6 +33,7 @@ interface Result {
 export default function ScrambleSolver() {
   const [puzzle, setPuzzle] = useState("4x4x4");
   const [input, setInput] = useState("");
+  const [attempts, setAttempts] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [activeMove, setActiveMove] = useState<number | null>(null);
@@ -41,11 +42,13 @@ export default function ScrambleSolver() {
   const solve = async () => {
     setError(null);
     setCopied(false);
-    const raw = input.trim().replace(/[()\n]/g, " ");
-    if (!raw) {
+    const scrambleRaw = input.trim().replace(/[()\n]/g, " ");
+    const attemptsRaw = attempts.trim().replace(/[()\n]/g, " ");
+    if (!scrambleRaw) {
       setError("Paste the scramble first — it's the move sequence your timer app showed you.");
       return;
     }
+    const raw = attemptsRaw ? `${scrambleRaw} ${attemptsRaw}` : scrambleRaw;
     const moves = raw.split(/\s+/).filter(Boolean);
     // The cubing.js parser accepts arbitrary custom move names, so gate on a
     // strict NxN token whitelist first: R, U', Fw2, 2R, 3Uw2, x, M'…
@@ -108,11 +111,25 @@ export default function ScrambleSolver() {
         </div>
         <textarea
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            setResult(null);
+          }}
           rows={3}
           placeholder="Paste your scramble here, e.g.  R U' F2 Rw2 D' B R' Uw F' …"
           aria-label="Scramble input"
           className="mt-3 w-full resize-y rounded-xl border border-line bg-bg px-4 py-3 font-mono text-sm placeholder:text-faint focus:border-line-strong focus:outline-none"
+        />
+        <textarea
+          value={attempts}
+          onChange={(e) => {
+            setAttempts(e.target.value);
+            setResult(null);
+          }}
+          rows={1}
+          placeholder="Optional: moves you've made since scrambling (they'll be undone too)"
+          aria-label="Moves made after the scramble"
+          className="mt-2 w-full resize-y rounded-xl border border-line bg-bg px-4 py-2.5 font-mono text-sm placeholder:text-faint focus:border-line-strong focus:outline-none"
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button
@@ -136,9 +153,8 @@ export default function ScrambleSolver() {
           Timer, cubing contests…). Scramble your <em>solved</em> cube with those
           exact moves holding <strong className="text-muted">white on top, green facing you</strong> —
           then follow the solution below in the same grip and it will end solved,
-          guaranteed. Hand-scrambled with no record of the moves? That state
-          can't be read back from a string — use the method below instead;
-          that's the real skill anyway.
+          guaranteed. Tried to solve it and made things worse? Type those moves
+          in the second box — the solution will unwind them too.
         </p>
       </div>
 

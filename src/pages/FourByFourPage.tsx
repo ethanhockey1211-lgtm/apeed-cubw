@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import LessonShell from "../components/LessonShell";
 import AlgCard from "../components/AlgCard";
 import ScrambleSolver from "../components/ScrambleSolver";
@@ -54,7 +55,12 @@ export default function FourByFourPage() {
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           Scrambled from an app and want out? Paste the exact scramble it gave
           you. You'll see your cube in 3D and a move-by-move solution you can
-          follow on the real thing — correct by construction, every time.
+          follow on the real thing — correct by construction, every time. (Got
+          a scrambled <em>3×3</em> with no scramble string? The{" "}
+          <Link to="/solver" className="font-semibold text-cube-orange hover:underline">
+            photo &amp; paint solver
+          </Link>{" "}
+          reads the cube itself.)
         </p>
         <div className="mt-5">
           <ScrambleSolver />

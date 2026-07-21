@@ -10,4 +10,8 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 2000,
   },
+  // cubing/search runs in a code-split worker, which Vite can only bundle as ESM
+  worker: {
+    format: "es",
+  },
 });

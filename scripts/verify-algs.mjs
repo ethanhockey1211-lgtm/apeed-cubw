@@ -790,8 +790,66 @@ const { twoOllCases, twoPblCases, fourCases, pyraCases } = await import("../src/
   console.log(`Pyraminx: checked ${pyraCases.length} algorithms`);
 }
 
+// ——— Facelet engine (photo/paint state entry): cross-engine verification ———
+{
+  const { initFaceletEngine, faceletsToPattern, applyMovesToFacelets, solvedFacelets } =
+    await import("../src/lib/facelets3x3.ts");
+  await initFaceletEngine(kpuzzle);
+  const solvedPattern = kpuzzle.defaultPattern();
+  const MOVES18 = ["U","U'","U2","D","D'","D2","F","F'","F2","B","B'","B2","R","R'","R2","L","L'","L2"];
+  let seed = 12345;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff), seed / 0x7fffffff);
+  let checked = 0;
+  const checkState = (seq) => {
+    checked++;
+    const res = faceletsToPattern(kpuzzle, applyMovesToFacelets(solvedFacelets(), seq));
+    if (!res.ok || !res.pattern.isIdentical(solvedPattern.applyAlg(seq))) {
+      failures++;
+      console.error(`FAIL facelets: engines disagree on "${seq}"`);
+    }
+  };
+  for (const m of MOVES18) checkState(m);
+  for (let i = 0; i < 500; i++) {
+    checkState(Array.from({ length: 30 }, () => MOVES18[Math.floor(rnd() * MOVES18.length)]).join(" "));
+  }
+  // unsolvable inputs must be rejected, not silently mis-built
+  const geo = applyMovesToFacelets(solvedFacelets(), "R U R' U'");
+  const twisted = geo.map((f) => f.slice());
+  [twisted[0][8], twisted[3][0]] = [twisted[3][0], twisted[0][8]];
+  if (faceletsToPattern(kpuzzle, twisted).ok) {
+    failures++;
+    console.error("FAIL facelets: twisted corner accepted");
+  }
+  const miscount = geo.map((f) => f.slice());
+  miscount[0][0] = 5;
+  if (faceletsToPattern(kpuzzle, miscount).ok) {
+    failures++;
+    console.error("FAIL facelets: sticker miscount accepted");
+  }
+  console.log(`Facelet engine: ${checked} states agree across independent engines, invalid inputs rejected`);
+
+  // end-to-end: facelets → pattern → real solver → provably solved
+  const { experimentalSolve3x3x3IgnoringCenters } = await import("cubing/search");
+  const scr = "F R' D2 L U' B2 D R2 F' L2 U2 B D' R U F2 L' D B2 U'";
+  const st = faceletsToPattern(kpuzzle, applyMovesToFacelets(solvedFacelets(), scr));
+  const sol = await experimentalSolve3x3x3IgnoringCenters(st.pattern);
+  const done = st.pattern.applyAlg(sol);
+  const solvedOk = ["EDGES", "CORNERS"].every((orbitName) => {
+    const o = done.patternData[orbitName];
+    return o.pieces.every((p, i) => p === i && o.orientation[i] === 0);
+  });
+  if (!solvedOk) {
+    failures++;
+    console.error("FAIL facelets: solver solution did not solve the built pattern");
+  } else {
+    console.log(`State solver: end-to-end solve verified (${sol.toString().split(" ").length} moves)`);
+  }
+}
+
 if (failures > 0) {
   console.error(`\n${failures} algorithm(s) FAILED verification`);
   process.exit(1);
 }
 console.log("\nAll algorithms verified ✓");
+// cubing/search leaves worker threads alive — exit explicitly.
+process.exit(0);

@@ -56,7 +56,18 @@ principles and worked example solves.
 - **Scramble solver** — paste any timer-app scramble (2×2–5×5), see your
   exact cube in 3D and an animated move-by-move solution (the scramble
   retraced in reverse — correct by construction), with strict notation
-  validation
+  validation and an optional "moves you've made since" field that gets
+  unwound too
+- **Photo & paint state solver** (`/solver`) — enter a 3×3 exactly as it
+  looks (per-face photo auto-fill with tap-to-fix, or paint the net) and
+  get a genuine computed solution (~20 moves) from the cubing.js two-phase
+  solver. The facelet→state engine derives its orientation conventions
+  empirically and is cross-checked against an independent geometric
+  simulator on 500+ random states in `npm run verify`; unsolvable paint
+  jobs (twists, flips, swaps, miscounts) are rejected with specific
+  messages, and every solution is re-verified against the engine before
+  display. 4×4 photo solving is deliberately absent — arbitrary-state 4×4
+  is beyond any in-browser engine, and the page says so honestly
 
 ## Stack
 

@@ -87,13 +87,13 @@ export default function PuzzlesPage() {
               Stuck cube? The solver will un-stick it.
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Paste the scramble from your timer app and watch your exact cube —
-              2×2 up to 5×5 — get solved move by move on screen, so you can
-              follow along on yours.
+              Photograph or paint your 3×3 for a real computed solution — or
+              paste any timer-app scramble (2×2 up to 5×5) and follow the exact
+              undo, move by move on a 3D cube.
             </p>
           </div>
           <Link
-            to="/puzzles/4x4#solver"
+            to="/solver"
             className="group inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
           >
             Open the solver

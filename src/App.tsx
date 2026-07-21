@@ -11,6 +11,7 @@ import F2LBasicsPage from "./pages/F2LBasicsPage";
 import TwoLookOllPage from "./pages/TwoLookOllPage";
 import TwoLookPllPage from "./pages/TwoLookPllPage";
 import PuzzlesPage from "./pages/PuzzlesPage";
+import SolverPage from "./pages/SolverPage";
 import TwoByTwoPage from "./pages/TwoByTwoPage";
 import FourByFourPage from "./pages/FourByFourPage";
 import PyraminxPage from "./pages/PyraminxPage";
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/learn/2-look-oll" element={<Page><TwoLookOllPage /></Page>} />
           <Route path="/learn/2-look-pll" element={<Page><TwoLookPllPage /></Page>} />
           <Route path="/puzzles" element={<Page><PuzzlesPage /></Page>} />
+          <Route path="/solver" element={<Page><SolverPage /></Page>} />
           <Route path="/puzzles/2x2" element={<Page><TwoByTwoPage /></Page>} />
           <Route path="/puzzles/4x4" element={<Page><FourByFourPage /></Page>} />
           <Route path="/puzzles/pyraminx" element={<Page><PyraminxPage /></Page>} />
