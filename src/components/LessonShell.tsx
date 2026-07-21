@@ -12,6 +12,8 @@ interface LessonShellProps {
   progress?: { learned: number; total: number };
   children: React.ReactNode;
   next?: { to: string; label: string; blurb: string };
+  backTo?: string;
+  backLabel?: string;
 }
 
 /**
@@ -26,6 +28,8 @@ export default function LessonShell({
   progress,
   children,
   next,
+  backTo = "/learn",
+  backLabel = "Guided path",
 }: LessonShellProps) {
   const a = accents[accent];
   const pct = progress && progress.total > 0 ? (progress.learned / progress.total) * 100 : 0;
@@ -33,10 +37,10 @@ export default function LessonShell({
   return (
     <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 md:pt-12">
       <Link
-        to="/learn"
+        to={backTo}
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-faint transition-colors hover:text-muted"
       >
-        <span aria-hidden>←</span> Guided path
+        <span aria-hidden>←</span> {backLabel}
       </Link>
 
       <div className="mt-4 max-w-2xl">

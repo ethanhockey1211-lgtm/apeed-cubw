@@ -8,6 +8,8 @@ export interface TwistyCubeHandle {
 
 interface TwistyCubeProps {
   alg: string;
+  /** cubing.js puzzle id (default 3x3x3) — e.g. "2x2x2", "4x4x4", "pyraminx", "megaminx" */
+  puzzle?: string;
   /** "end" (default) treats the alg end as solved, so the start shows the case */
   setupAnchor?: "start" | "end";
   setupAlg?: string;
@@ -65,6 +67,7 @@ function IconButton({
 
 export default function TwistyCube({
   alg,
+  puzzle = "3x3x3",
   setupAnchor = "end",
   setupAlg,
   stickering = "full",
@@ -105,7 +108,7 @@ export default function TwistyCube({
     import("cubing/twisty").then(({ TwistyPlayer: Player }) => {
       if (cancelled || !mountRef.current) return;
       player = new Player({
-        puzzle: "3x3x3",
+        puzzle: puzzle as never,
         alg,
         experimentalSetupAnchor: setupAnchor,
         ...(setupAlg ? { experimentalSetupAlg: setupAlg } : {}),
@@ -168,7 +171,7 @@ export default function TwistyCube({
       player?.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alg, setupAlg, setupAnchor, stickering, stickeringMask, loop]);
+  }, [alg, puzzle, setupAlg, setupAnchor, stickering, stickeringMask, loop]);
 
   // Keep the player's own color scheme in sync with the app theme.
   useEffect(() => {

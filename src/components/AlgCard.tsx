@@ -82,6 +82,10 @@ interface AlgCardProps {
   stickeringMask?: string;
   /** “Why it works” — the alg decomposed into known triggers */
   intuition?: string;
+  /** cubing.js puzzle id (default 3x3x3) */
+  puzzle?: string;
+  /** Setup applied before the case state (default z2 = white on the bottom) */
+  setupAlg?: string;
 }
 
 function AlgCardInner({
@@ -90,6 +94,8 @@ function AlgCardInner({
   stickering = "full",
   stickeringMask,
   intuition,
+  puzzle = "3x3x3",
+  setupAlg = "z2",
 }: AlgCardProps) {
   const { isLearned, toggle } = useProgress();
   const learned = isLearned(algCase.id);
@@ -134,7 +140,8 @@ function AlgCardInner({
         <LazyMount className="h-full w-full">
           <TwistyCube
             alg={algCase.alg}
-            setupAlg="z2"
+            puzzle={puzzle}
+            setupAlg={setupAlg}
             stickering={stickering}
             stickeringMask={stickeringMask}
             tempo={1.2}

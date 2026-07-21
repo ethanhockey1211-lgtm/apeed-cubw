@@ -10,6 +10,11 @@ import NotationPage from "./pages/NotationPage";
 import F2LBasicsPage from "./pages/F2LBasicsPage";
 import TwoLookOllPage from "./pages/TwoLookOllPage";
 import TwoLookPllPage from "./pages/TwoLookPllPage";
+import PuzzlesPage from "./pages/PuzzlesPage";
+import TwoByTwoPage from "./pages/TwoByTwoPage";
+import FourByFourPage from "./pages/FourByFourPage";
+import PyraminxPage from "./pages/PyraminxPage";
+import MegaminxPage from "./pages/MegaminxPage";
 import { sectionById } from "./data/sections";
 
 function Page({ children }: { children: React.ReactNode }) {
@@ -44,6 +49,11 @@ export default function App() {
           <Route path="/learn/f2l-basics" element={<Page><F2LBasicsPage /></Page>} />
           <Route path="/learn/2-look-oll" element={<Page><TwoLookOllPage /></Page>} />
           <Route path="/learn/2-look-pll" element={<Page><TwoLookPllPage /></Page>} />
+          <Route path="/puzzles" element={<Page><PuzzlesPage /></Page>} />
+          <Route path="/puzzles/2x2" element={<Page><TwoByTwoPage /></Page>} />
+          <Route path="/puzzles/4x4" element={<Page><FourByFourPage /></Page>} />
+          <Route path="/puzzles/pyraminx" element={<Page><PyraminxPage /></Page>} />
+          <Route path="/puzzles/megaminx" element={<Page><MegaminxPage /></Page>} />
           <Route path="/cross" element={<Page><CrossPage /></Page>} />
           <Route path="/f2l" element={<Page><SectionPage section={sectionById.f2l} /></Page>} />
           <Route path="/oll" element={<Page><SectionPage section={sectionById.oll} /></Page>} />

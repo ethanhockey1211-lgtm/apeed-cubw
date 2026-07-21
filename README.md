@@ -48,6 +48,16 @@ principles and worked example solves.
 - **Dark theme by default** with light mode, cube-color accent palette, fully
   responsive with a bottom tab bar on mobile
 
+- **Other puzzles** (`/puzzles`) — beginner methods for 2×2 (nine algs you
+  already know from CFOP), 4×4 (reduction + the two parity fixes), Pyraminx
+  (three algs, one found by exhaustive search) and Megaminx, all rendered on
+  real multi-puzzle twisty players and machine-verified against their
+  engines
+- **Scramble solver** — paste any timer-app scramble (2×2–5×5), see your
+  exact cube in 3D and an animated move-by-move solution (the scramble
+  retraced in reverse — correct by construction), with strict notation
+  validation
+
 ## Stack
 
 React 19 · Vite · TypeScript · Tailwind CSS v4 · cubing.js · Framer Motion

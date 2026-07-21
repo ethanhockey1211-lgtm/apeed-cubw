@@ -293,6 +293,34 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ——— Other puzzles teaser ——— */}
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 md:pb-16">
+        <motion.div {...fadeUp}>
+          <Link
+            to="/puzzles"
+            className="group flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_14px_44px_-14px_rgba(0,0,0,0.45)] sm:p-6"
+          >
+            <div className="max-w-xl">
+              <p className="font-display text-sm font-bold tracking-wide text-cube-orange uppercase">
+                Beyond the 3×3
+              </p>
+              <h2 className="mt-1 font-display text-xl font-bold tracking-tight sm:text-2xl">
+                2×2 · 4×4 · Pyraminx · Megaminx — plus a scramble solver
+              </h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                Beginner methods that reuse what you learn here, and a solver
+                that takes any timer-app scramble (2×2 to 5×5) and plays the
+                exact solution on your cube in 3D.
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-cube-orange">
+              Explore puzzles
+              <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+            </span>
+          </Link>
+        </motion.div>
+      </section>
+
       {/* ——— Features ——— */}
       <section className="border-y border-line bg-surface/50">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3 md:py-16">

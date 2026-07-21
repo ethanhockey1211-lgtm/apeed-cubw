@@ -657,6 +657,139 @@ if ((twoLookOllIds ?? []).length !== 10 || (twoLookPllIds ?? []).length !== 6) {
 }
 console.log(`Stages: checked ${(learnStages ?? []).length} stages against ${allCaseIds.size} case ids`);
 
+// ——— Other puzzles: 2x2, 4x4 parity, pyraminx ———
+const { cube2x2x2, puzzles: puzzleLoaders } = await import("cubing/puzzles");
+const { twoOllCases, twoPblCases, fourCases, pyraCases } = await import("../src/data/puzzles.ts");
+
+{
+  // 2x2: every alg's case state must keep the D layer solved; PBL algs must
+  // additionally leave all corners oriented (pure permutation cases).
+  const kp2 = await cube2x2x2.kpuzzle();
+  const solved2 = kp2.defaultPattern();
+  const uT = kp2.algToTransformation(new Alg("U")).transformationData["CORNERS"];
+  const U2 = uT.permutation
+    .map((p, i) => (p !== i || uT.orientationDelta[i] !== 0 ? i : -1))
+    .filter((i) => i >= 0);
+  for (const c of [...twoOllCases, ...twoPblCases]) {
+    const o = solved2.applyAlg(new Alg(c.alg).invert()).patternData["CORNERS"];
+    const dOk = o.pieces.every((_, i) => U2.includes(i) || (o.pieces[i] === i && o.orientation[i] === 0));
+    const oriented = U2.every((i) => o.orientation[i] === 0);
+    if (!dOk) {
+      failures++;
+      console.error(`FAIL 2x2 ${c.id}: case state breaks the bottom layer (${c.alg})`);
+    }
+    if (c.group === "pbl" && !oriented) {
+      failures++;
+      console.error(`FAIL 2x2 ${c.id}: PBL case should be permutation-only (${c.alg})`);
+    }
+    if (c.group === "oll" && oriented) {
+      failures++;
+      console.error(`FAIL 2x2 ${c.id}: OLL case is already oriented — wrong alg? (${c.alg})`);
+    }
+  }
+  console.log(`2x2: checked ${twoOllCases.length + twoPblCases.length} cases`);
+}
+
+{
+  // 4x4: all algs parse; PLL parity must be exactly a two-dedge swap
+  // (corners untouched, 4 wing pieces moved, centers color-safe); OLL parity
+  // must be centers-color-safe.
+  const kp4 = await puzzleLoaders["4x4x4"].kpuzzle();
+  const solved4 = kp4.defaultPattern();
+  const orbitNames4 = Object.keys(solved4.patternData);
+  const centersOrbit = orbitNames4.find((n) => solved4.patternData[n].pieces.length === 24 && n.includes("CENTER"));
+  const centerClass = [];
+  if (centersOrbit) {
+    for (const f of FACES) {
+      const d = kp4.algToTransformation(new Alg(f)).transformationData[centersOrbit];
+      for (let i = 0; i < 24; i++) if (d.permutation[i] !== i || d.orientationDelta[i] !== 0) centerClass[i] = f;
+    }
+  }
+  const centersColorSafe = (p) => {
+    if (!centersOrbit) return true;
+    const o = p.patternData[centersOrbit];
+    return o.pieces.every((piece, pos) => centerClass[piece] === centerClass[pos]);
+  };
+  for (const c of fourCases) {
+    let p;
+    try {
+      p = solved4.applyAlg(new Alg(c.alg));
+    } catch (e) {
+      failures++;
+      console.error(`FAIL 4x4 ${c.id}: alg does not parse (${e})`);
+      continue;
+    }
+    if (!centersColorSafe(p)) {
+      failures++;
+      console.error(`FAIL 4x4 ${c.id}: scrambles center colors (${c.alg})`);
+    }
+    if (c.id === "4x4-pll-parity") {
+      const corners = p.patternData["CORNERS"];
+      const edges = p.patternData["EDGES"];
+      const cornersFixed = corners.pieces.every((pc, i) => pc === i && corners.orientation[i] === 0);
+      const movedWings = edges.pieces.filter((pc, i) => pc !== i || edges.orientation[i] !== 0).length;
+      if (!cornersFixed || movedWings !== 4) {
+        failures++;
+        console.error(`FAIL 4x4 pll-parity: expected pure two-dedge swap (cornersFixed=${cornersFixed}, wings=${movedWings})`);
+      }
+    }
+  }
+  console.log(`4x4: checked ${fourCases.length} algorithms`);
+}
+
+{
+  // Pyraminx: cycles must purely 3-cycle the top edges with no flips and the
+  // two cycle algs must be mutual inverses; the flip alg must flip exactly
+  // the UL and UR edges in place, touching nothing else.
+  const kpP = await puzzleLoaders["pyraminx"].kpuzzle();
+  const solvedP = kpP.defaultPattern();
+  const uE = kpP.algToTransformation(new Alg("U")).transformationData["EDGES"];
+  const TOP = uE.permutation.map((p, i) => (p !== i ? i : -1)).filter((i) => i >= 0);
+  const restFixed = (p) => {
+    for (const orbitName of Object.keys(p.patternData)) {
+      const o = p.patternData[orbitName];
+      for (let i = 0; i < o.pieces.length; i++) {
+        if (orbitName === "EDGES" && TOP.includes(i)) continue;
+        if (o.pieces[i] !== i || o.orientation[i] !== 0) return false;
+      }
+    }
+    return true;
+  };
+  for (const c of pyraCases) {
+    const p = solvedP.applyAlg(new Alg(c.alg));
+    if (!restFixed(p)) {
+      failures++;
+      console.error(`FAIL pyraminx ${c.id}: touches pieces outside the top edges (${c.alg})`);
+      continue;
+    }
+    const e = p.patternData["EDGES"];
+    if (c.group === "ll" && c.id.startsWith("pyra-cycle")) {
+      const pure = TOP.every((i) => e.orientation[i] === 0) && TOP.every((i) => e.pieces[i] !== i);
+      if (!pure) {
+        failures++;
+        console.error(`FAIL pyraminx ${c.id}: expected a pure flip-free 3-cycle (${c.alg})`);
+      }
+    }
+    if (c.id === "pyra-flip") {
+      const inPlace = TOP.every((i) => e.pieces[i] === i);
+      const flipped = TOP.filter((i) => e.orientation[i] !== 0).length;
+      if (!inPlace || flipped !== 2) {
+        failures++;
+        console.error(`FAIL pyraminx flip: expected in-place two-flip (inPlace=${inPlace}, flipped=${flipped})`);
+      }
+    }
+  }
+  const cyc = pyraCases.filter((c) => c.id.startsWith("pyra-cycle"));
+  if (cyc.length === 2) {
+    const combined = solvedP.applyAlg(new Alg(`${cyc[0].alg} ${cyc[1].alg}`));
+    if (!combined.isIdentical(solvedP)) {
+      failures++;
+      console.error("FAIL pyraminx: the two cycle algs are not mutual inverses");
+    }
+  }
+  console.log(`Pyraminx: checked ${pyraCases.length} algorithms`);
+}
+
 if (failures > 0) {
   console.error(`\n${failures} algorithm(s) FAILED verification`);
   process.exit(1);
