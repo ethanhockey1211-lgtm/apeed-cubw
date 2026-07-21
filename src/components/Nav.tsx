@@ -87,6 +87,21 @@ export default function Nav() {
                 />
               )}
             </NavLink>
+            <NavLink
+              to="/solver"
+              className={`relative rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/solver") ? "text-ink" : "text-muted hover:text-ink"
+              }`}
+            >
+              Solver
+              {location.pathname.startsWith("/solver") && (
+                <motion.span
+                  layoutId="nav-underline"
+                  className="absolute inset-x-3 -bottom-[13px] h-0.5 rounded-full bg-cube-red"
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                />
+              )}
+            </NavLink>
           </nav>
 
           <div className="ml-auto md:ml-0">
