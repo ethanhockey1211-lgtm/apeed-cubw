@@ -121,15 +121,15 @@ export default function Nav() {
         aria-label="Sections"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-5">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${isActive ? "text-ink" : "text-faint"}`
+              `flex flex-col items-center gap-0.5 py-3 text-[11px] font-semibold ${isActive ? "text-ink" : "text-faint"}`
             }
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M3 10.5 12 3l9 7.5" />
               <path d="M5 9.5V21h14V9.5" />
             </svg>
@@ -138,41 +138,43 @@ export default function Nav() {
           <NavLink
             to="/learn"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${isActive ? "text-cube-green" : "text-faint"}`
+              `flex flex-col items-center gap-0.5 py-3 text-[11px] font-semibold ${isActive ? "text-cube-green" : "text-faint"}`
             }
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M12 3 2 8l10 5 10-5-10-5z" />
               <path d="M5 10.5V16c0 1.5 3 3 7 3s7-1.5 7-3v-5.5" />
             </svg>
             Learn
           </NavLink>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${
-                  isActive ? accents[item.accent].text : "text-faint"
-                }`
-              }
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
-                <rect x="4" y="4" width="16" height="16" rx="2.5" />
-                <path d="M4 9.33h16M4 14.66h16M9.33 4v16M14.66 4v16" strokeWidth="1.4" />
-              </svg>
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems
+            .filter((item) => item.to === "/oll" || item.to === "/pll")
+            .map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex flex-col items-center gap-0.5 py-3 text-[11px] font-semibold ${
+                    isActive ? accents[item.accent].text : "text-faint"
+                  }`
+                }
+              >
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
+                  <rect x="4" y="4" width="16" height="16" rx="2.5" />
+                  <path d="M4 9.33h16M4 14.66h16M9.33 4v16M14.66 4v16" strokeWidth="1.4" />
+                </svg>
+                {item.label}
+              </NavLink>
+            ))}
           <NavLink
             to="/puzzles"
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold ${
+              `flex flex-col items-center gap-0.5 py-3 text-[11px] font-semibold ${
                 isActive ? "text-cube-orange" : "text-faint"
               }`
             }
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
               <path d="M12 2 3 7v10l9 5 9-5V7l-9-5z" />
               <path d="M3 7l9 5 9-5M12 12v10" />
             </svg>
