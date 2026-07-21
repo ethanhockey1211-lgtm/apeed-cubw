@@ -179,6 +179,12 @@ export default function Landing() {
               >
                 Browse algorithms
               </Link>
+              <Link
+                to="/solver"
+                className="inline-flex items-center gap-2 rounded-xl border border-line-strong px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-surface"
+              >
+                🧩 Solve my cube
+              </Link>
             </motion.div>
           </div>
 

@@ -104,7 +104,13 @@ export default function Nav() {
             </NavLink>
           </nav>
 
-          <div className="ml-auto md:ml-0">
+          <div className="ml-auto flex items-center gap-2 md:ml-0">
+            <Link
+              to="/solver"
+              className="rounded-full border border-line px-3 py-1.5 text-xs font-bold text-muted transition-colors hover:border-line-strong hover:text-ink md:hidden"
+            >
+              Solver
+            </Link>
             <ThemeToggle />
           </div>
         </div>
