@@ -590,10 +590,23 @@ export async function solve4x4(colors: Facelets4): Promise<Solve4Result> {
     const built = lib3.faceletsToPattern(kpuzzle, mapped);
     if (built.ok && built.pattern) {
       const tail = (await experimentalSolve3x3x3IgnoringCenters(built.pattern)).toString();
-      const full = `${solution} ${tail}`.trim().replace(/\s+/g, " ");
+      let full = `${solution} ${tail}`.trim().replace(/\s+/g, " ");
       const finalState = applyMoves4(colors, full);
       if (!isUniform4(finalState)) {
         return { ok: false, errors: ["Internal verification failed — no solution shown. Please report this state."] };
+      }
+      // Orientation-normalize the finish: append the whole-cube rotation that
+      // lands on the standard scheme (white up, green front). This makes the
+      // twisty player's inverse-anchored preview show the PAINTED state
+      // exactly, instead of a rotated frame the user never held.
+      const canonical = (f: Facelets4) => f.every((face, i) => face[0] === i);
+      if (!canonical(finalState)) {
+        for (const r of ROT24) {
+          if (r && canonical(applyMoves4(finalState, r))) {
+            full = `${full} ${r}`;
+            break;
+          }
+        }
       }
       return { ok: true, solution: full, moveCount: full.split(" ").length, errors: [] };
     }

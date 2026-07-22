@@ -100,7 +100,12 @@ function buildPermutation(
   const inLayer = (p: Vec) => {
     const c = p[def.axis];
     const fromFace = def.end === 1 ? m - c : c; // 0 at the face, growing inward
-    return fromFace < 2 * depth && fromFace >= 2 * minDepth;
+    // Side stickers sit at odd depths (1,3,…), the near face at 0 and the far
+    // face at 2n — the far plane belongs to the slab only for full rotations.
+    return (
+      fromFace >= 2 * minDepth &&
+      (fromFace < 2 * depth || (depth === n && fromFace === 2 * n))
+    );
   };
   const perm = positions.map((p, i) => {
     if (!inLayer(p)) return i;
@@ -178,6 +183,27 @@ export const labeledFacelets4 = (): Facelets4 =>
 PERMS_4["x"] = buildPermutation(4, "R", 4, signs);
 PERMS_4["y"] = buildPermutation(4, "U", 4, signs);
 PERMS_4["z"] = buildPermutation(4, "F", 4, signs);
+{
+  // Whole-cube rotations must equal their wide-move decompositions — this
+  // caught a slab-boundary bug once; keep it as a permanent init assertion.
+  const compose = (a: number[], b: number[]) => a.map((_, i) => b[a[i]]);
+  const inverse = (p: number[]) => {
+    const inv = new Array<number>(p.length);
+    p.forEach((v, i) => (inv[v] = i));
+    return inv;
+  };
+  const checks: [string, string, string][] = [
+    ["x", "Rw", "Lw"],
+    ["y", "Uw", "Dw"],
+    ["z", "Fw", "Bw"],
+  ];
+  for (const [rotName, wide, oppWide] of checks) {
+    const expected = compose(PERMS_4[wide], inverse(PERMS_4[oppWide]));
+    if (PERMS_4[rotName].join() !== expected.join()) {
+      throw new Error(`facelet geometry: ${rotName} != ${wide}·${oppWide}'`);
+    }
+  }
+}
 
 const TOKEN_4 = /^(2?[UDFBRL]w?|[xyz])(2|')?$/;
 

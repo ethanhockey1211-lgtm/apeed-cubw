@@ -854,17 +854,33 @@ const { twoOllCases, twoPblCases, fourCases, pyraCases } = await import("../src/
   const MOVES4 = ["U","U'","U2","D","D'","F","F'","F2","B","B'","R","R'","R2","L","L'","Uw","Uw'","Uw2","Dw","Fw","Fw'","Bw","Rw","Rw'","Rw2","Lw"];
   let seed4 = 777;
   const rnd4 = () => ((seed4 = (seed4 * 1103515245 + 12345) & 0x7fffffff), seed4 / 0x7fffffff);
+  const { invertMoves } = await import("../src/lib/moves.ts");
   let solved4 = 0;
   let moves4 = 0;
+  const ROTS = ["", "x", "y'", "x2 y", "z y2"];
   for (let i = 0; i < 6; i++) {
     const scr = Array.from({ length: 40 }, () => MOVES4[Math.floor(rnd4() * MOVES4.length)]).join(" ");
-    const res = await solve4x4(applyMoves4(solvedFacelets4(), scr));
-    if (res.ok) {
-      solved4++;
-      moves4 += res.moveCount;
-    } else {
+    // simulate an arbitrary grip: the user may hold the cube any way
+    const painted = applyMoves4(solvedFacelets4(), `${scr} ${ROTS[i % ROTS.length]}`.trim());
+    const res = await solve4x4(painted);
+    if (!res.ok) {
       failures++;
       console.error(`FAIL 4x4 solver on random state #${i}: ${res.errors.join(" | ")}`);
+      continue;
+    }
+    solved4++;
+    moves4 += res.moveCount;
+    // the finish must land on the standard scheme (canonical orientation)…
+    const final4 = applyMoves4(painted, res.solution);
+    if (!final4.every((face, f) => face.every((c) => c === f))) {
+      failures++;
+      console.error(`FAIL 4x4 solver #${i}: finish is not orientation-normalized`);
+    }
+    // …which makes the preview (inverse from canonical solved) EXACTLY the painted state
+    const preview = applyMoves4(solvedFacelets4(), invertMoves(res.solution));
+    if (JSON.stringify(preview) !== JSON.stringify(painted)) {
+      failures++;
+      console.error(`FAIL 4x4 solver #${i}: preview state does not match painted stickers`);
     }
   }
   // a twisted-corner paint job must be rejected, not mis-solved
