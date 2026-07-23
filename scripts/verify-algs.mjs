@@ -671,6 +671,43 @@ for (const c of beginnerInsertCases ?? []) {
 }
 console.log(`Beginner inserts: checked ${(beginnerInsertCases ?? []).length} algorithms`);
 
+// ——— 4x4 last-two-centers: each alg must touch ONLY its target faces ———
+{
+  const { applyMoves4: am4, solvedFacelets4: sf4 } = await import("../src/lib/faceletsNxN.ts");
+  const { l2cCases, guided4x4, fourCases: fc } = await import("../src/data/puzzles.ts");
+  const CENTER_CELLS = [5, 6, 9, 10];
+  const L2C_TARGETS = { "4x4-l2c-one": [0, 2], "4x4-l2c-column": [0, 2], "4x4-l2c-opposite": [0, 5] };
+  for (const c of l2cCases ?? []) {
+    const f = am4(sf4(), c.alg);
+    const touched = [];
+    for (let face = 0; face < 6; face++) {
+      if (CENTER_CELLS.some((cell) => f[face][cell] !== face)) touched.push(face);
+    }
+    const want = L2C_TARGETS[c.id];
+    if (!want || touched.join() !== want.join()) {
+      failures++;
+      console.error(`FAIL L2C ${c.id}: centers touched [${touched}], expected [${want}]`);
+    }
+  }
+  // guided 4x4 phases must reassemble into the exact verified algorithms
+  const algOf = new Map((fc ?? []).map((c) => [c.id, c.alg]));
+  for (const g of guided4x4 ?? []) {
+    const alg = algOf.get(g.caseId);
+    const joined = tokens(g.phases.map((p) => p.moves).join(" "));
+    if (!alg || joined !== tokens(alg)) {
+      failures++;
+      console.error(`FAIL guided4x4 "${g.title}": phases (${joined}) != ${g.caseId} alg (${alg})`);
+    }
+    for (const p of g.phases) {
+      if (p.echoOf && tokens(p.moves) !== tokens(algOf.get(p.echoOf) ?? "")) {
+        failures++;
+        console.error(`FAIL guided4x4 "${g.title}": echoOf ${p.echoOf} mismatch`);
+      }
+    }
+  }
+  console.log(`4x4 L2C + guided reasoning: ${(l2cCases ?? []).length} center cases + ${(guided4x4 ?? []).length} walkthroughs verified`);
+}
+
 {
   // 2x2: every alg's case state must keep the D layer solved; PBL algs must
   // additionally leave all corners oriented (pure permutation cases).

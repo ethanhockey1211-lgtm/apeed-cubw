@@ -1,4 +1,4 @@
-import type { AccentColor, AlgCase } from "../lib/types";
+import type { AccentColor, AlgCase, SolvePhase } from "../lib/types";
 
 /*
  * Beginner methods for the other WCA puzzles. Every algorithm here is
@@ -154,6 +154,46 @@ export const twoPblCases: AlgCase[] = [
 
 export const twoByTwoIds = [...twoOllCases, ...twoPblCases].map((c) => c.id);
 
+/*
+ * ——— 4×4 last two centers: machine-derived case set ———
+ * Each algorithm is verified to change ONLY its two target faces' center
+ * colors (scripts/verify-algs.mjs); the case patterns in the recognition
+ * text are measured from the actual inverse states, not guessed. Corners
+ * and edges get shuffled — harmless, since centers come first.
+ */
+export const CENTERS_MASK_4 =
+  "EDGES:IIIIIIIIIIIIIIIIIIIIIIII,CORNERS:IIIIIIII,CENTERS:------------------------";
+
+export const l2cCases: AlgCase[] = [
+  {
+    id: "4x4-l2c-one",
+    name: "L2C: one piece each",
+    group: "centers",
+    alg: "Rw U Rw'",
+    recognition:
+      "Hold the two unfinished faces at the front and top. One wrong piece on each — line them up in the right-hand column and this three-move swap trades them.",
+    difficulty: "easy",
+  },
+  {
+    id: "4x4-l2c-column",
+    name: "L2C: column swap",
+    group: "centers",
+    alg: "Rw U2 Rw'",
+    recognition:
+      "Front and top again, but a whole vertical column of two is wrong on each face. Same motion with a double turn in the middle.",
+    difficulty: "easy",
+  },
+  {
+    id: "4x4-l2c-opposite",
+    name: "L2C: opposite faces",
+    group: "centers",
+    alg: "Rw2 U2 Rw2",
+    recognition:
+      "Two pieces stuck on the OPPOSITE face (top and bottom trade a column). Verified to touch nothing but those two faces' centers.",
+    difficulty: "medium",
+  },
+];
+
 /* ——— 4×4 reduction method: the three algorithms that aren't intuitive ——— */
 
 export const fourCases: AlgCase[] = [
@@ -196,6 +236,68 @@ export const fourCases: AlgCase[] = [
 ];
 
 export const fourByFourIds = fourCases.map((c) => c.id);
+
+/*
+ * ——— Guided reasoning for every 4×4-specific algorithm ———
+ * Phase chunks reassemble to exactly the case's verified algorithm (checked
+ * by scripts/verify-algs.mjs); the L2E middle phase is string-identical to
+ * the pairing flip (echoOf), proving "it's the flip you already know".
+ */
+export interface Guided4x4 {
+  caseId: string;
+  title: string;
+  story: string;
+  phases: SolvePhase[];
+}
+
+export const guided4x4: Guided4x4[] = [
+  {
+    caseId: "4x4-edge-flip",
+    title: "The pairing flip",
+    story:
+      "Two halves lined up but one backwards. Two triggers fix it: take the slot out, put it back the other way round.",
+    phases: [
+      { moves: "R U R'", intent: "First trigger: lift the front-right edge slot out into the free top layer." },
+      { moves: "F R' F' R", intent: "Second trigger: bring it back in rotated — the slot returns flipped." },
+    ],
+  },
+  {
+    caseId: "4x4-l2e",
+    title: "Last two edges",
+    story:
+      "The finisher: both remaining edges sit at the front, each built from mismatched halves. Slice, flip, slice back.",
+    phases: [
+      { moves: "Uw'", intent: "Slice: shift the inner layer one turn so the two mismatched halves meet in a single slot." },
+      {
+        moves: "R U R' F R' F' R",
+        echoOf: "4x4-edge-flip",
+        intent: "Move for move, the pairing flip you already know — it trades the front-right slot's halves.",
+      },
+      { moves: "Uw", intent: "Slice back: the inner layer returns home and both edges come out whole." },
+    ],
+  },
+  {
+    caseId: "4x4-oll-parity",
+    title: "OLL parity",
+    story:
+      "The scary one, tamed: it's one drumbeat — wide-right, top-double — played ten times with three exceptions. Learn the beat, not the letters.",
+    phases: [
+      { moves: "Rw U2 x Rw U2 Rw U2", intent: "The beat starts: wide-right + top-double, with one regrip (x) baked in — your hands stay on the same layers." },
+      { moves: "Rw' U2 Lw U2 Rw' U2", intent: "The middle: two counter-turns, and the single left-hand moment of the whole algorithm." },
+      { moves: "Rw U2 Rw' U2 Rw'", intent: "The runout: same beat, landing back where your grip started." },
+    ],
+  },
+  {
+    caseId: "4x4-pll-parity",
+    title: "PLL parity",
+    story:
+      "Six moves on two layers: the inner slice does the swapping, the top layer feeds it. Machine-verified to touch nothing but the two edge pairs.",
+    phases: [
+      { moves: "2R2 U2 2R2", intent: "Inner-slice double, top double, inner again — the slice carries the swap." },
+      { moves: "Uw2 2R2 2U2", intent: "Shift wide, one more slice, then square the inner top layer back up. Done — corners never moved." },
+    ],
+  },
+];
 
 /*
  * ——— 4x4 full beginner method: the 3x3-stage middle-edge inserts ———

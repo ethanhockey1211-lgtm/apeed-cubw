@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import LessonShell from "../components/LessonShell";
 import AlgCard from "../components/AlgCard";
+import GuidedSolve from "../components/GuidedSolve";
 import TwistyCube from "../components/TwistyCube";
 import LazyMount from "../components/LazyMount";
-import { fourCases, beginnerInsertCases } from "../data/puzzles";
+import { fourCases, beginnerInsertCases, l2cCases, guided4x4, CENTERS_MASK_4 } from "../data/puzzles";
 import { EO_MASK, eoCases, intuitionById, ocllCases, tlPllCornerCases, tlPllEdgeCases } from "../data/learn";
 import { sectionById } from "../data/sections";
 import { useProgress } from "../lib/progress";
@@ -14,6 +15,7 @@ const parityCases = fourCases.filter((c) => c.group === "parity");
 
 /** Every tracked algorithm in the full method, in learning order. */
 export const fullMethodIds = [
+  ...l2cCases.map((c) => c.id),
   ...pairingCases.map((c) => c.id),
   ...beginnerInsertCases.map((c) => c.id),
   ...eoCases.map((c) => c.id),
@@ -37,6 +39,33 @@ function StageHeader({ n, title, blurb }: { n: number; title: string; blurb: str
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted">{blurb}</p>
     </motion.div>
+  );
+}
+
+function GuidedBlock({ caseId }: { caseId: string }) {
+  const g = guided4x4.find((x) => x.caseId === caseId);
+  if (!g) return null;
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.4 }}
+      className="rounded-2xl border border-line bg-surface p-5 sm:p-6"
+    >
+      <div className="mb-4 max-w-2xl">
+        <p className="font-display text-sm font-bold text-cube-orange">Watch with reasoning</p>
+        <h3 className="mt-0.5 font-display text-lg font-bold tracking-tight">{g.title}</h3>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{g.story}</p>
+      </div>
+      <GuidedSolve
+        phases={g.phases}
+        puzzle="4x4x4"
+        setupAlg="z2"
+        accent="orange"
+        label={`Guided 4x4 walkthrough: ${g.title}`}
+      />
+    </motion.article>
   );
 }
 
@@ -109,6 +138,22 @@ export default function FourMethodPage() {
             note="Drop a finished pair into its face. The wide turn gives back what it borrowed, so completed centers survive."
           />
         </div>
+        <div className="mt-8 max-w-2xl">
+          <h3 className="font-display text-lg font-bold tracking-tight">
+            Last two centers — the three cases
+          </h3>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted">
+            The final two faces can't borrow from anywhere, so they become real
+            cases. Everything else on these cubes is grayed out — only centers
+            matter here, and each algorithm is machine-verified to change{" "}
+            <em>only</em> its two target faces' centers.
+          </p>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {l2cCases.map((c) => (
+            <AlgCard key={c.id} algCase={c} accent="orange" puzzle="4x4x4" stickeringMask={CENTERS_MASK_4} />
+          ))}
+        </div>
       </section>
 
       {/* Stage 2 */}
@@ -122,6 +167,10 @@ export default function FourMethodPage() {
           {pairingCases.map((c) => (
             <AlgCard key={c.id} algCase={c} accent="orange" puzzle="4x4x4" />
           ))}
+        </div>
+        <div className="mt-5 space-y-5">
+          <GuidedBlock caseId="4x4-edge-flip" />
+          <GuidedBlock caseId="4x4-l2e" />
         </div>
       </section>
 
@@ -237,6 +286,10 @@ export default function FourMethodPage() {
           {parityCases.map((c) => (
             <AlgCard key={c.id} algCase={c} accent="orange" puzzle="4x4x4" />
           ))}
+        </div>
+        <div className="mt-5 space-y-5">
+          <GuidedBlock caseId="4x4-oll-parity" />
+          <GuidedBlock caseId="4x4-pll-parity" />
         </div>
       </section>
     </LessonShell>

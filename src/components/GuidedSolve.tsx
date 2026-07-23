@@ -8,6 +8,7 @@ import type { AccentColor, SolvePhase } from "../lib/types";
 
 interface GuidedSolveProps {
   phases: SolvePhase[];
+  puzzle?: string;
   setupAlg?: string;
   setupAnchor?: "start" | "end";
   stickering?: string;
@@ -27,6 +28,7 @@ interface GuidedSolveProps {
  */
 export default function GuidedSolve({
   phases,
+  puzzle = "3x3x3",
   setupAlg = "z2",
   setupAnchor = "end",
   stickering,
@@ -66,6 +68,7 @@ export default function GuidedSolve({
       <LazyMount className="h-full w-full">
         <TwistyCube
           alg={fullAlg}
+          puzzle={puzzle}
           setupAlg={setupAlg}
           setupAnchor={setupAnchor}
           stickering={stickering}
@@ -151,7 +154,7 @@ export default function GuidedSolve({
                   </span>
                   {p.echoOf && (
                     <span className="rounded-full bg-cube-green/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-cube-green uppercase">
-                      a basic insert
+                      you know this one
                     </span>
                   )}
                 </p>
