@@ -69,13 +69,24 @@ export default function FourByFourPage() {
 
       {/* Method */}
       <section className="mt-14">
-        <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-          The reduction method
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          Three stages. The first two are intuitive — no case lists, just
-          technique. The third is everything you already know.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+              The reduction method
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+              Three stages. The first two are intuitive — no case lists, just
+              technique. The third is everything you already know.
+            </p>
+          </div>
+          <Link
+            to="/puzzles/4x4/method"
+            className="group inline-flex items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-semibold text-bg transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]"
+          >
+            Full walkthrough — every case, every alg
+            <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+          </Link>
+        </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {stages.map((s, i) => (
             <motion.div

@@ -659,7 +659,17 @@ console.log(`Stages: checked ${(learnStages ?? []).length} stages against ${allC
 
 // ——— Other puzzles: 2x2, 4x4 parity, pyraminx ———
 const { cube2x2x2, puzzles: puzzleLoaders } = await import("cubing/puzzles");
-const { twoOllCases, twoPblCases, fourCases, pyraCases } = await import("../src/data/puzzles.ts");
+const { twoOllCases, twoPblCases, fourCases, pyraCases, beginnerInsertCases } = await import("../src/data/puzzles.ts");
+
+// Beginner middle-edge inserts are ordinary 3x3 algorithms: their case state
+// must leave everything solved except the top layer and one slot.
+for (const c of beginnerInsertCases ?? []) {
+  if (!passes(caseStateFor(c.alg), checkF2L)) {
+    failures++;
+    console.error(`FAIL beginner insert ${c.id}: ${c.alg}`);
+  }
+}
+console.log(`Beginner inserts: checked ${(beginnerInsertCases ?? []).length} algorithms`);
 
 {
   // 2x2: every alg's case state must keep the D layer solved; PBL algs must

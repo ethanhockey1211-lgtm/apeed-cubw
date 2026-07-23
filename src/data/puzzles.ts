@@ -197,6 +197,32 @@ export const fourCases: AlgCase[] = [
 
 export const fourByFourIds = fourCases.map((c) => c.id);
 
+/*
+ * ——— 4x4 full beginner method: the 3x3-stage middle-edge inserts ———
+ * Classic layer-by-layer edge insertion (for people who haven't learned
+ * intuitive F2L yet). Verified against the 3x3 engine like every F2L case.
+ */
+export const beginnerInsertCases: AlgCase[] = [
+  {
+    id: "begin-edge-right",
+    name: "Middle edge → right",
+    group: "inserts",
+    alg: "U R U' R' U' F' U F",
+    recognition:
+      "A top-layer edge matches the front center, and its top color matches the right center. Two four-move halves you may recognize: basic F2L inserts #1 and #2 back to back.",
+    difficulty: "easy",
+  },
+  {
+    id: "begin-edge-left",
+    name: "Middle edge → left",
+    group: "inserts",
+    alg: "U' L' U L U F U' F'",
+    recognition:
+      "Mirror case: the top edge matches the front center and its top color matches the left center. Same idea with the left hand.",
+    difficulty: "easy",
+  },
+];
+
 /* ——— Pyraminx beginner method ——— */
 
 export const pyraCases: AlgCase[] = [

@@ -14,6 +14,7 @@ import PuzzlesPage from "./pages/PuzzlesPage";
 import SolverPage from "./pages/SolverPage";
 import TwoByTwoPage from "./pages/TwoByTwoPage";
 import FourByFourPage from "./pages/FourByFourPage";
+import FourMethodPage from "./pages/FourMethodPage";
 import PyraminxPage from "./pages/PyraminxPage";
 import MegaminxPage from "./pages/MegaminxPage";
 import { sectionById } from "./data/sections";
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/solver" element={<Page><SolverPage /></Page>} />
           <Route path="/puzzles/2x2" element={<Page><TwoByTwoPage /></Page>} />
           <Route path="/puzzles/4x4" element={<Page><FourByFourPage /></Page>} />
+          <Route path="/puzzles/4x4/method" element={<Page><FourMethodPage /></Page>} />
           <Route path="/puzzles/pyraminx" element={<Page><PyraminxPage /></Page>} />
           <Route path="/puzzles/megaminx" element={<Page><MegaminxPage /></Page>} />
           <Route path="/cross" element={<Page><CrossPage /></Page>} />
