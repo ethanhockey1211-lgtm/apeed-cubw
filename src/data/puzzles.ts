@@ -167,6 +167,15 @@ export const fourCases: AlgCase[] = [
     difficulty: "easy",
   },
   {
+    id: "4x4-l2e",
+    name: "Last two edges",
+    group: "pairing",
+    alg: "Uw' R U R' F R' F' R Uw",
+    recognition:
+      "Down to two unfinished edges: hold them at the front-left and front-right. Each slot matches on the front but clashes on the side — slice (Uw'), run the flip you already know, slice back (Uw). Both edges finish at once; centers are machine-verified safe.",
+    difficulty: "medium",
+  },
+  {
     id: "4x4-oll-parity",
     name: "OLL parity",
     group: "parity",

@@ -119,14 +119,15 @@ export default function FourByFourPage() {
       <section className="mt-14">
         <div className="max-w-2xl">
           <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-            The only three algorithms
+            The only four algorithms
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            One helper for edge pairing, and the two parity fixes. That's the
+            Two helpers for edge pairing (the flip, and the last-two-edges
+            finisher built from it), and the two parity fixes. That's the
             complete list of things to memorize on a 4×4 beyond your 3×3 set.
           </p>
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {fourCases.map((c) => (
             <AlgCard key={c.id} algCase={c} accent="orange" puzzle="4x4x4" />
           ))}
